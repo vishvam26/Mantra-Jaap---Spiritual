@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: divine-jap-app
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    disk:
+      name: database-storage
+      mountPath: /data
+      sizeGB: 1
+    envVars:
+      - key: RENDER
+        value: "true"
