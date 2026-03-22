@@ -299,6 +299,8 @@
 
         // auto-jap.html ma saveToDB function replace karo
         function saveToDB() {
+            const sessionIncrease = count - (parseInt(localStorage.getItem('jap_curr_at_start')) || 0);
+            const newTotal = dbTotalCount + sessionIncrease;
             // Navo total = Database mathi aavelo juno total + tame aaje karela total jap
             // Aa logic thi total count hamesha sahi rahese
             fetch('/update_count', {
@@ -306,7 +308,7 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     current_count: count,
-                    total_count: dbTotalCount + (count - (parseInt(localStorage.getItem('jap_curr_at_start')) || 0))
+                    total_count: newTotal
                 })
             }).then(res => res.json())
                 .then(data => console.log("Database Sync Done"));
