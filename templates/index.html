@@ -13,7 +13,9 @@
 
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Crimson+Pro:wght@700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Crimson+Pro:wght@700&display=swap"
+        rel="stylesheet">
 
     <style>
         :root {
@@ -279,7 +281,9 @@
             <input type="time" id="notif-time" onchange="saveNotif()"
                 style="border:none; background:rgba(255,255,255,0.1); color:var(--text-color); padding:5px; border-radius:8px;">
         </div>
-        <h1 id="mantra-title" style="font-family:'Crimson Pro',serif; font-size: 2.2rem; margin: 10px 0; color: var(--p);">Radha Radha</h1>
+        <h1 id="mantra-title"
+            style="font-family:'Crimson Pro',serif; font-size: 2.2rem; margin: 10px 0; color: var(--p);">Radha Radha
+        </h1>
         <select id="mantra-select" onchange="changeMantra()">
             <option value="Radha Radha" data-sound="radhe.mp3">Radha Radha</option>
             <option value="Om Namah Shivay" data-sound="shivay.mp3">Om Namah Shivay</option>
@@ -288,10 +292,13 @@
         </select>
         <div style="margin-top:12px; display:flex; justify-content:space-between; align-items:center;">
             <label style="font-size:0.85rem; font-weight:600;">Goal:</label>
-            <input type="number" id="goal-input" class="in-box" value="108" min="108" onchange="updateGoal()" style="width:75px; margin:0;">
+            <input type="number" id="goal-input" class="in-box" value="108" min="108" onchange="updateGoal()"
+                style="width:75px; margin:0;">
         </div>
         <div style="margin-top:15px; display:flex; align-items:center; gap:10px;">
-            <button onclick="toggleBG()" id="bgm-btn" style="background:var(--p); color:white; border:none; padding:8px 12px; border-radius:10px;">🎵 OFF</button>
+            <button onclick="toggleBG()" id="bgm-btn"
+                style="background:var(--p); color:white; border:none; padding:8px 12px; border-radius:10px;">🎵
+                OFF</button>
             <input type="range" min="0" max="1" step="0.1" value="0.2" style="flex:1;" oninput="setVol(this.value)">
         </div>
     </div>
@@ -304,7 +311,8 @@
     <button class="jap-btn" onclick="handleJap()">JAP KARO</button>
 
     <div style="text-align: center;">
-        <button class="hold-reset" id="reset-btn" onmousedown="startH()" onmouseup="stopH()" ontouchstart="startH()" ontouchend="stopH()">🔄</button>
+        <button class="hold-reset" id="reset-btn" onmousedown="startH()" onmouseup="stopH()" ontouchstart="startH()"
+            ontouchend="stopH()">🔄</button>
         <p style="font-size:0.7rem; opacity:0.5; margin-top:5px;">Hold to Reset Today</p>
     </div>
 
@@ -317,7 +325,8 @@
         <div class="report-grid" id="report-grid"></div>
     </div>
 
-    <button class="jap-btn" onclick="downloadBhaktiCard()" style="font-size: 1rem; padding: 12px; margin-top: 10px;">📤 SHARE CARD</button>
+    <button class="jap-btn" onclick="downloadBhaktiCard()" style="font-size: 1rem; padding: 12px; margin-top: 10px;">📤
+        SHARE CARD</button>
 
     <div class="badge-row">
         <span class="badge" id="b1">🎖️</span>
@@ -358,8 +367,8 @@
 
         window.onload = () => {
             fetch(`${window.location.origin}/get_count?user_id=${userId}`)
-                 .then(r => r.json())
-                 .then(d => {
+                .then(r => r.json())
+                .then(d => {
                     curr = d.current_count;
                     total = d.total_count;
                     document.getElementById('count-num').innerText = curr;
@@ -374,7 +383,7 @@
                 document.body.classList.add('light-mode');
                 document.getElementById('mode-icon').innerText = "☀️";
             }
-            
+
             document.getElementById('notif-time').value = localStorage.getItem('pTime') || "";
             changeMantra();
             setT(currentTheme);
@@ -434,26 +443,26 @@
             if (total >= 5000) document.getElementById('b3').classList.add('active');
         }
 
-       function save() {
-    const userId = localStorage.getItem('jap_user_id'); // userId મેળવો
-    
-    fetch('/update_count', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-            user_id: userId,        // આ લાઈન હોવી જ જોઈએ
-            current_count: curr, 
-            total_count: total 
-        })
-    })
-    .then(response => {
-        if (!response.ok) console.error("Update failed with status:", response.status);
-    })
-    .catch(err => console.error("Fetch error:", err));
+        function save() {
+            const userId = localStorage.getItem('jap_user_id'); // userId મેળવો
 
-    localStorage.setItem('jap_total', total); 
-    localStorage.setItem('jap_curr', curr);
-}
+            fetch('/update_count', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    user_id: userId,        // આ લાઈન હોવી જ જોઈએ
+                    current_count: curr,
+                    total_count: total
+                })
+            })
+                .then(response => {
+                    if (!response.ok) console.error("Update failed with status:", response.status);
+                })
+                .catch(err => console.error("Fetch error:", err));
+
+            localStorage.setItem('jap_total', total);
+            localStorage.setItem('jap_curr', curr);
+        }
 
         function startH() {
             document.getElementById('reset-btn').style.transform = "scale(0.9)";
@@ -483,7 +492,7 @@
 
         function updateGoal() { goal = Math.max(108, document.getElementById('goal-input').value); updateUI(); }
         function saveNotif() { localStorage.setItem('pTime', document.getElementById('notif-time').value); Notification.requestPermission(); }
-        
+
         function checkNotif() {
             const setT = localStorage.getItem('pTime');
             const now = new Date();
