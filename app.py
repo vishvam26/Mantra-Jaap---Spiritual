@@ -7,7 +7,7 @@ from supabase import create_client, Client
 app = Flask(__name__)
 IST = pytz.timezone('Asia/Kolkata')
 
-# --- Supabase Setup (Tari Navi URL ane Key) ---
+# --- Supabase Setup ---
 SUPABASE_URL = "https://hawaajmvzrhivqrjpsxo.supabase.co"
 SUPABASE_KEY = "sb_publishable__lCMKk14l6cydqWv0TjY9w_O7jXc6eU"
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
@@ -31,11 +31,9 @@ def get_count():
     yesterday = (now - timedelta(days=1)).strftime('%Y-%m-%d')
 
     try:
-        # User record fetch karo
         res = supabase.table("jap_counter").select("*").eq("user_id", user_id).execute()
         
         if not res.data:
-            # Navo user hoy to insert karo
             row = {"user_id": user_id, "current_count": 0, "total_count": 0, "last_date": today, "streak": 0}
             supabase.table("jap_counter").insert(row).execute()
         else:
@@ -46,28 +44,23 @@ def get_count():
         last_date = row['last_date']
         streak = row['streak']
 
-        # Streak Logic Fix
+        # Streak Logic
         if last_date != today:
             if last_date == yesterday and curr_val > 0:
                 streak += 1
             else:
                 streak = 1 if curr_val > 0 else 0
-            
             curr_val = 0 
             supabase.table("jap_counter").update({
                 "current_count": 0, "last_date": today, "streak": streak
             }).eq("user_id", user_id).execute()
 
-        # Weekly history load karo
         hist_res = supabase.table("jap_history").select("*").eq("user_id", user_id).execute()
         history = {item['date']: item['count'] for item in hist_res.data}
 
         return jsonify({
-            'current_count': curr_val, 
-            'total_count': total_val,
-            'streak': streak, 
-            'today': today, 
-            'history': history
+            'current_count': curr_val, 'total_count': total_val,
+            'streak': streak, 'today': today, 'history': history
         })
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -84,6 +77,7 @@ def update_count():
         return jsonify({'error': 'User ID missing'}), 400
 
     try:
+        # Supabase માં ડેટા અપડેટ કરવા માટે
         supabase.table("jap_counter").update({
             "current_count": curr, "total_count": total, "last_date": today
         }).eq("user_id", user_id).execute()
@@ -95,16 +89,6 @@ def update_count():
         return jsonify({'status': 'success'})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
-@app.route('/manifest.json')
-def serve_manifest():
-    return send_from_directory('static', 'manifest.json')
-
-@app.route('/sw.js')
-def serve_sw():
-    response = make_response(send_from_directory('static', 'sw.js'))
-    response.headers['Content-Type'] = 'application/javascript'
-    return response
 
 if __name__ == '__main__':
     app.run(debug=True)
