@@ -357,9 +357,9 @@
         const getBaseUrl = () => window.location.origin;
 
         window.onload = () => {
-            fetch(`${getBaseUrl()}/get_count?user_id=${userId}`)
-                .then(r => r.json())
-                .then(d => {
+            fetch(`${window.location.origin}/get_count?user_id=${userId}`)
+                 .then(r => r.json())
+                 .then(d => {
                     curr = d.current_count;
                     total = d.total_count;
                     document.getElementById('count-num').innerText = curr;
@@ -435,11 +435,11 @@
         }
 
         function save() {
-            fetch(`${getBaseUrl()}/update_count`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ user_id: userId, current_count: curr, total_count: total })
-            });
+            fetch(`${window.location.origin}/update_count`, {
+                 method: 'POST',
+                 headers: { 'Content-Type': 'application/json' },
+                 body: JSON.stringify({ user_id: userId, current_count: curr, total_count: total })
+             });
         }
 
         function startH() {
