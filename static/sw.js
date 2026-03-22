@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mantra-jaap';
+const CACHE_NAME = 'mantra-jaap-v1';
 const urlsToCache = [
   '/',
   '/static/logo.png',
@@ -6,8 +6,21 @@ const urlsToCache = [
 ];
 
 self.addEventListener('install', event => {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache))
+  );
+});
+
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cache => {
+          if (cache !== CACHE_NAME) return caches.delete(cache);
+        })
+      );
+    })
   );
 });
 
