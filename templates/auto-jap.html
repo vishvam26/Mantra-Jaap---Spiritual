@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Radha Radha | Auto jaap</title>
     <link rel="icon" type="image/png" href="/static/logo.png">
-    <script src="https://www.youtube.com/iframe_api"></script>
+    <!-- Confetti library for celebration -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <style>
         :root {
@@ -34,29 +34,16 @@
             height: 100%;
             width: 100%;
             transition: 0.5s;
-            font-family: 'Segoe UI', sans-serif;
-            overflow: hidden;
-        }
-
-        #bg-layer {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: var(--bg-grad);
-            z-index: -1;
             display: flex;
             align-items: center;
             justify-content: center;
+            overflow: hidden;
+            color: var(--text-color);
         }
 
         .glass-card {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 100;
             background: var(--glass);
             backdrop-filter: blur(25px);
             border: 1px solid rgba(255, 255, 255, 0.2);
@@ -65,16 +52,17 @@
             width: 320px;
             text-align: center;
             box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
-            color: var(--text-color);
+            position: relative;
+            z-index: 10;
         }
 
         .card-active-effect {
-            animation: kailashBreathe 2.2s infinite alternate ease-in-out;
+            animation: breathe 2.2s infinite alternate ease-in-out;
         }
 
-        @keyframes kailashBreathe {
+        @keyframes breathe {
             to {
-                transform: translate(-50%, -50%) scale(1.03);
+                transform: scale(1.03);
                 box-shadow: 0 0 55px var(--glow-color);
             }
         }
@@ -100,7 +88,7 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 75px;
+            font-size: 70px;
             font-weight: 800;
         }
 
@@ -109,7 +97,7 @@
         }
 
         .progress-ring__circle {
-            transition: stroke-dashoffset 0.8s ease;
+            transition: stroke-dashoffset 0.5s ease;
             stroke: var(--accent);
             filter: drop-shadow(0 0 8px var(--accent));
         }
@@ -153,6 +141,8 @@
             transition: 0.3s;
         }
 
+        .main-btn:active { transform: scale(0.98); }
+
         .theme-toggle {
             background: none;
             border: 1px solid var(--accent);
@@ -178,11 +168,9 @@
 
 <body>
 
-    <div id="bg-layer"></div>
-
     <div class="glass-card" id="main-card">
         <div class="mantra-title">Radha Radha</div>
-        <div style="font-size: 11px; opacity: 0.6; margin-top: -5px;">Eternal Peace Mode</div>
+        <div style="font-size: 11px; opacity: 0.6; margin-top: -5px;">Automatic Peace Mode</div>
 
         <div class="circle-container">
             <svg height="200" width="200">
@@ -207,152 +195,137 @@
         </div>
 
         <a href="javascript:void(0)" onclick="exitSession()"
-            style="color: var(--accent); text-decoration: none; font-size: 11px; display: block; margin-top: 25px; opacity: 0.5;">SAVE
-            & EXIT</a>
+            style="color: var(--accent); text-decoration: none; font-size: 12px; display: block; margin-top: 25px; opacity: 0.6; font-weight: bold;">SAVE & EXIT</a>
     </div>
 
     <audio id="auto-audio" loop src="/static/audio/auto.mp3"></audio>
 
     <script>
-        let audioPlayer = document.getElementById('auto-audio');
-        let count = 0;           // Aa session na current counts
-        let dbTotalCount = 0;    // Database mathi aavela total counts
+        // 1. User ID and Counters
+        const userId = localStorage.getItem('jap_user_id');
+        let count = 0;           
+        let dbTotalCount = 0;    
         let isPlaying = false;
         let counterInterval;
+        const audioPlayer = document.getElementById('auto-audio');
 
-        // 1. Page load thay tyare Database mathi latest counts lai aavo
+        const getBaseUrl = () => window.location.origin;
+
+        // Initialization
         document.addEventListener('DOMContentLoaded', async () => {
-            // LocalStorage mathi turant data batavo (Optional for UI speed)
-            count = parseInt(localStorage.getItem('jap_curr')) || 0;
-            document.getElementById('count-display').innerText = count;
-            document.getElementById('mala-count').innerText = Math.floor(count / 108);
-            updateProgress();
+            if(!userId) {
+                alert("Pehle main page par jaaiye.");
+                window.location.href = '/';
+                return;
+            }
+            
+            // Default Theme setup
+            if(localStorage.getItem('darkMode') === 'false') {
+                document.body.classList.add('light-mode');
+            }
 
             await loadDataFromDB();
         });
 
         async function loadDataFromDB() {
             try {
-                const response = await fetch('/get_count');
+                const response = await fetch(`${getBaseUrl()}/get_count?user_id=${userId}`);
                 const d = await response.json();
 
                 if (d.current_count !== undefined) {
                     count = parseInt(d.current_count);
-                    dbTotalCount = parseInt(d.total_count); // Database no total count store karo
+                    dbTotalCount = parseInt(d.total_count);
+
+                    // Session start count track karo accurate total mate
+                    localStorage.setItem('jap_curr_at_start', count);
 
                     document.getElementById('count-display').innerText = count;
                     document.getElementById('mala-count').innerText = Math.floor(count / 108);
-                    updateProgress();
+                    updateUI();
                 }
             } catch (err) {
-                console.error("Data load karva ma bhul chhe:", err);
+                console.error("Fetch error:", err);
             }
         }
 
-        // 2. Jaap Sharu karvanu function (Local Audio sathe)
+        function toggleJap() {
+            if (isPlaying) stopJap(); else startJap();
+        }
+
         function startJap() {
             if (isPlaying) return;
-
-            // Audio play karo
-            if (audioPlayer) {
-                audioPlayer.play().catch(err => console.error("Audio play error:", err));
-            }
-
             isPlaying = true;
+            
+            audioPlayer.play().catch(e => console.log("Audio play failed"));
+            
             document.getElementById('main-card').classList.add('card-active-effect');
             document.getElementById('start-btn').innerText = "Pause Session";
 
             counterInterval = setInterval(() => {
                 count++;
-                // Navo total = Database no total + current session ma jetla vadhiya te
-                // Note: Ahi logic badlavo padshe jethi count double na thay
-                // Pan saraltat mate, dar vakhte live update kariye:
-
                 document.getElementById('count-display').innerText = count;
-                localStorage.setItem('jap_curr', count);
-
-                // Dar 1 count par database update karvu hoy to (Optional):
-                // saveToDB(count, dbTotalCount + 1); 
-
+                
                 if (count % 108 === 0) {
                     document.getElementById('mala-count').innerText = Math.floor(count / 108);
-                    confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                    confetti({ particleCount: 100, spread: 60, origin: { y: 0.7 } });
                 }
 
-                updateProgress();
+                updateUI();
                 spawnSnowflake();
-            }, 850); // Tamari audio file ni speed mujab aane adjust kari shako (e.g. 1000ms)
+            }, 900); // Speed control
         }
 
-
-
         function stopJap() {
+            if (!isPlaying) return;
             isPlaying = false;
-            if (audioPlayer) audioPlayer.pause();
+            
+            audioPlayer.pause();
             document.getElementById('main-card').classList.remove('card-active-effect');
             clearInterval(counterInterval);
             document.getElementById('start-btn').innerText = "Resume Jaap";
 
-            // Stop thay tyare final save
             saveToDB();
         }
 
-        // auto-jap.html ma saveToDB function replace karo
         function saveToDB() {
-            // Session માં જેટલા જાપ વધ્યા તેટલા જ ટોટલમાં ઉમેરો
-            const sessionIncrease = count - (parseInt(localStorage.getItem('jap_curr_at_start')) || 0);
+            const startCount = parseInt(localStorage.getItem('jap_curr_at_start')) || 0;
+            const sessionIncrease = count - startCount;
             const finalTotal = dbTotalCount + sessionIncrease;
 
-            fetch('/update_count', {
+            fetch(`${getBaseUrl()}/update_count`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
+                    user_id: userId,
                     current_count: count,
                     total_count: finalTotal
                 })
-            }).then(res => res.json()).then(data => {
-                console.log("Synced with Supabase");
             });
         }
 
-        // loadDataFromDB ma aa line umero
-        async function loadDataFromDB() {
-            try {
-                const response = await fetch('/get_count');
-                const d = await response.json();
-                if (d.current_count !== undefined) {
-                    count = parseInt(d.current_count);
-                    dbTotalCount = parseInt(d.total_count);
-
-                    // Session sharu thaya pehla no count save karo jethi calculation sahi thay
-                    localStorage.setItem('jap_curr_at_start', count);
-
-                    document.getElementById('count-display').innerText = count;
-                    document.getElementById('mala-count').innerText = Math.floor(count / 108);
-                    updateProgress();
-                }
-            } catch (err) { console.log(err); }
-        }
-        function toggleJap() {
-            if (isPlaying) stopJap(); else startJap();
-        }
-
-        // 4. Exit karva mate
         function exitSession() {
-            stopJap();
+            if (isPlaying) stopJap(); else saveToDB();
             setTimeout(() => {
                 window.location.href = '/';
             }, 500);
         }
 
-        // UI Progress Functions
-        function updateProgress() {
+        function updateUI() {
             const circle = document.getElementById('progress-circle');
             const bar = document.getElementById('goal-bar');
             const p = (count % 108) / 108;
+            
+            // Progress circle (SVG offset logic)
             const offset = 565.48 - (p * 565.48);
             if (circle) circle.style.strokeDashoffset = offset;
+            
+            // Linear bar
             if (bar) bar.style.width = (p * 100) + "%";
+        }
+
+        function toggleTheme() {
+            const isLight = document.body.classList.toggle('light-mode');
+            localStorage.setItem('darkMode', !isLight);
         }
 
         function spawnSnowflake() {
@@ -363,11 +336,12 @@
             let size = Math.random() * 5 + 2;
             s.style.width = size + "px"; s.style.height = size + "px";
             document.body.appendChild(s);
-            s.animate([{ transform: 'translateY(0)', opacity: 0.6 }, { transform: 'translateY(110vh)', opacity: 0 }], { duration: 4000 });
+            s.animate([
+                { transform: 'translateY(0)', opacity: 0.6 },
+                { transform: 'translateY(110vh)', opacity: 0 }
+            ], { duration: 4000 });
             setTimeout(() => s.remove(), 4000);
         }
-
-        function toggleTheme() { document.body.classList.toggle('light-mode'); }
     </script>
 </body>
 
