@@ -295,7 +295,7 @@
             const sessionIncrease = count - startCount;
             const finalTotal = dbTotalCount + sessionIncrease;
 
-            fetch(`${getBaseUrl()}/update_count`, {
+            fetch(${window.location.origin}/update_count, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
