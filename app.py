@@ -86,13 +86,16 @@ def update_count():
     cursor = conn.cursor()
     try:
         # 1. Pehla check karo ke hal ni streak ketli chhe
-        cursor.execute('SELECT streak FROM jap_counter WHERE id = 1')
-        s_row = cursor.fetchone()
-        streak = s_row[0] if s_row else 0
+        cursor.execute('SELECT last_date, streak FROM jap_counter WHERE id = 1')
+        row = cursor.fetchone()
+        last_date, streak = row if row else (None, 0)
         
         # 2. Logic: Jo aaje pehli var jaap thaya (curr > 0) ane streak 0 chhe, to tene 1 karo
-        if curr > 0 and streak == 0:
-            streak = 1
+        if curr > 0 and last_date != today:
+            if last_date == yesterday:
+               streak += 1
+            else:
+               streak = 1
             
         # 3. Database ma badhu update karo (streak sathe)
         cursor.execute('''UPDATE jap_counter 
