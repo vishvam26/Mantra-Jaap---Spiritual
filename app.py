@@ -6,8 +6,8 @@ from supabase import create_client, Client
 app = Flask(__name__)
 
 # --- Supabase Setup ---
-SUPABASE_URL = "https://bpnamocnrxrfsznvoqvw.supabase.co"
-SUPABASE_KEY = "sb_publishable_6poF0267VRL_Y9WkLAd04g_NRKG63En"
+SUPABASE_URL = "https://hddjwsnketzenwvtzrgv.supabase.co"
+SUPABASE_KEY = "sb_publishable_4VVMimPp7BbnCocnYNRuDw_gl8py4yI"
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 @app.route('/')
