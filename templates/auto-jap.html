@@ -6,10 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Radha Radha | Auto jaap</title>
     <link rel="icon" type="image/png" href="/static/logo.png">
-    <!-- Confetti library for celebration -->
+    <!-- Celebration mate confetti library -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <style>
         :root {
+            /* Default: Kailash Dark Theme */
             --bg-grad: linear-gradient(135deg, #00101a 0%, #012a4a 50%, #01497c 100%);
             --glow-color: rgba(225, 245, 254, 0.4);
             --text-color: #e1f5fe;
@@ -198,10 +199,11 @@
             style="color: var(--accent); text-decoration: none; font-size: 12px; display: block; margin-top: 25px; opacity: 0.6; font-weight: bold;">SAVE & EXIT</a>
     </div>
 
+    <!-- Background Music -->
     <audio id="auto-audio" loop src="/static/audio/auto.mp3"></audio>
 
     <script>
-        // 1. User ID and Counters
+        // 1. User ID ane Counters set karo
         const userId = localStorage.getItem('jap_user_id');
         let count = 0;           
         let dbTotalCount = 0;    
@@ -211,15 +213,15 @@
 
         const getBaseUrl = () => window.location.origin;
 
-        // Initialization
+        // Page load thaye tyare initialization
         document.addEventListener('DOMContentLoaded', async () => {
             if(!userId) {
-                alert("Pehle main page par jaaiye.");
+                alert("Pehle main page par jaaiye jethi userId bani shake.");
                 window.location.href = '/';
                 return;
             }
             
-            // Default Theme setup
+            // Theme setup
             if(localStorage.getItem('darkMode') === 'false') {
                 document.body.classList.add('light-mode');
             }
@@ -236,7 +238,7 @@
                     count = parseInt(d.current_count);
                     dbTotalCount = parseInt(d.total_count);
 
-                    // Session start count track karo accurate total mate
+                    // Accurate total mate session start count track karo
                     localStorage.setItem('jap_curr_at_start', count);
 
                     document.getElementById('count-display').innerText = count;
@@ -244,7 +246,7 @@
                     updateUI();
                 }
             } catch (err) {
-                console.error("Fetch error:", err);
+                console.error("Fetch error in loadDataFromDB:", err);
             }
         }
 
@@ -256,7 +258,8 @@
             if (isPlaying) return;
             isPlaying = true;
             
-            audioPlayer.play().catch(e => console.log("Audio play failed"));
+            // Audio chalu karo
+            audioPlayer.play().catch(e => console.log("Audio play failed, user interaction jaroori chhe."));
             
             document.getElementById('main-card').classList.add('card-active-effect');
             document.getElementById('start-btn').innerText = "Pause Session";
@@ -315,11 +318,11 @@
             const bar = document.getElementById('goal-bar');
             const p = (count % 108) / 108;
             
-            // Progress circle (SVG offset logic)
+            // Progress circle logic
             const offset = 565.48 - (p * 565.48);
             if (circle) circle.style.strokeDashoffset = offset;
             
-            // Linear bar
+            // Linear progress bar
             if (bar) bar.style.width = (p * 100) + "%";
         }
 
