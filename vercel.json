@@ -1,15 +1,8 @@
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "app.py",
-      "use": "@vercel/python"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "destination": "app.py"
-    }
+  "rewriteConfig": {
+    "dynamicRangeCheck": false
+  },
+  "rewrites": [
+    { "source": "/(.*)", "destination": "app.py" }
   ]
 }
