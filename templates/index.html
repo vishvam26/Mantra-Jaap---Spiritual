@@ -3,560 +3,371 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Mantra Jaap - Spiritual</title>
-
-    <link rel="manifest" href="/manifest.json">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radha Radha | Auto jaap</title>
     <link rel="icon" type="image/png" href="/static/logo.png">
-
+    <script src="https://www.youtube.com/iframe_api"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
-    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Crimson+Pro:wght@700&display=swap"
-        rel="stylesheet">
-
     <style>
         :root {
-            /* Default: Kailash Dark Theme */
             --bg-grad: linear-gradient(135deg, #00101a 0%, #012a4a 50%, #01497c 100%);
-            --glass: rgba(255, 255, 255, 0.12);
             --glow-color: rgba(225, 245, 254, 0.4);
-            --accent: #ffffff;
             --text-color: #e1f5fe;
-            --p: #00b4d8;
-            --s: #90e0ef;
+            --accent: #ffffff;
+            --glass: rgba(255, 255, 255, 0.12);
+            --btn-bg: linear-gradient(to right, #01497c, #012a4a);
         }
 
-/* Aa line replace karo */
-.light-mode {
-    --glass: rgba(0, 0, 0, 0.05);
-    --text-color: #2c3e50;
-    --glow-color: rgba(0, 0, 0, 0.1);
-    /* --bg-grad ahi fix nathi, jethi setT() tene badli shake */
-}
+        .light-mode {
+            --bg-grad: linear-gradient(135deg, #fff9e6 0%, #ffecb3 50%, #ffd54f 100%);
+            --glow-color: rgba(255, 215, 0, 0.5);
+            --text-color: #5d4037;
+            --accent: #ff8f00;
+            --glass: rgba(255, 255, 255, 0.4);
+            --btn-bg: linear-gradient(to right, #ffa000, #ff6f00);
+        }
 
-        body {
+        body,
+        html {
             margin: 0;
-            font-family: 'Poppins', sans-serif;
-            background: var(--bg-grad);
-            background-attachment: fixed;
-            color: var(--text-color);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            padding: 15px;
-            box-sizing: border-box;
-            transition: 0.5s ease;
-            overflow-x: hidden;
-        }
-
-        .top-row {
+            padding: 0;
+            height: 100%;
             width: 100%;
-            max-width: 400px;
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            align-items: center;
-        }
-
-        .mode-toggle {
-            background: var(--glass);
-            border: none;
-            color: var(--text-color);
-            padding: 8px 12px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 1.2rem;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .stat-card {
-            background: var(--glass);
-            padding: 8px 15px;
-            border-radius: 12px;
-            font-weight: 700;
-            font-size: 0.85rem;
-            backdrop-filter: blur(10px);
-        }
-
-        .badge-row {
-            display: flex;
-            gap: 10px;
-        }
-
-        .badge {
-            font-size: 1.5rem;
-            filter: grayscale(1);
-            opacity: 0.2;
             transition: 0.5s;
-        }
-
-        .badge.active {
-            filter: grayscale(0);
-            opacity: 1;
-            transform: scale(1.2);
-        }
-
-        .theme-tabs {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 15px;
-            width: 100%;
-            max-width: 400px;
-        }
-
-        .t-btn {
-            flex: 1;
-            padding: 10px;
-            border-radius: 50px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            font-size: 0.7rem;
-            font-weight: 700;
-            cursor: pointer;
-            background: var(--glass);
-            color: var(--text-color);
-            backdrop-filter: blur(10px);
-        }
-
-        .t-btn.active {
-            background: var(--p);
-            color: white;
-            border-color: var(--p);
-        }
-
-        .glass-card {
-            background: var(--glass);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 24px;
-            padding: 20px;
-            width: 100%;
-            max-width: 400px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            margin-bottom: 15px;
-            box-sizing: border-box;
-        }
-
-        .counter-ring {
-            width: 220px;
-            height: 220px;
-            border-radius: 50%;
-            border: 8px solid var(--glass);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            background: var(--glass);
-            margin: 15px 0;
-            box-shadow: 0 0 30px var(--glow-color);
-            animation: breathe 3s infinite alternate ease-in-out;
-            position: relative;
-        }
-
-        @keyframes breathe {
-            to {
-                box-shadow: 0 0 50px var(--glow-color);
-                transform: scale(1.02);
-            }
-        }
-
-        #count-num {
-            font-size: 5.5rem;
-            font-weight: 800;
-            color: var(--accent);
-            margin: 0;
-            text-shadow: 0 0 15px var(--glow-color);
-        }
-
-        .jap-btn {
-            background: linear-gradient(135deg, var(--p), var(--s));
-            color: white;
-            border: none;
-            padding: 18px 0;
-            width: 100%;
-            max-width: 320px;
-            font-size: 1.6rem;
-            border-radius: 50px;
-            cursor: pointer;
-            font-weight: 700;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-            transition: 0.2s;
-        }
-
-        .jap-btn:active {
-            transform: scale(0.95);
-        }
-
-        .hold-reset {
-            width: 55px;
-            height: 55px;
-            border-radius: 50%;
-            border: 2px solid #ef4444;
-            background: none;
-            color: #ef4444;
-            cursor: pointer;
-            position: relative;
+            font-family: 'Segoe UI', sans-serif;
             overflow: hidden;
         }
 
-        .hold-reset.active::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
+        #bg-layer {
+            position: fixed;
+            top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(239, 68, 68, 0.2);
-            transition: 1.5s linear;
-        }
-
-        .report-grid {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            height: 60px;
-            gap: 6px;
-            margin-top: 10px;
-        }
-
-        .bar {
-            width: 12px;
-            background: var(--p);
-            border-radius: 5px 5px 0 0;
-            min-height: 4px;
-            transition: 0.5s;
-            box-shadow: 0 0 10px var(--p);
-        }
-
-        select,
-        .in-box {
-            width: 100%;
-            padding: 12px;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            background: rgba(0, 0, 0, 0.2);
-            color: var(--text-color);
-        }
-
-        .share-btn {
-            margin-top: 20px;
-            background: var(--p);
-            color: white;
-            border: none;
-            padding: 15px 25px;
-            border-radius: 12px;
-            font-weight: 700;
-            cursor: pointer;
-            width: 100%;
-            max-width: 320px;
-        }
-
-        .auto-link {
-            padding: 10px 20px;
-            background: var(--glass);
-            color: var(--text-color);
-            text-decoration: none;
-            border-radius: 50px;
-            border: 1px solid var(--p);
-            font-size: 0.9rem;
-        }
-
-        /* Hidden Bhakti Card */
-        #bhakti-card-hidden {
-            position: absolute;
-            left: -9999px;
-            width: 400px;
-            height: 550px;
             background: var(--bg-grad);
-            padding: 40px;
+            z-index: -1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .glass-card {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 100;
+            background: var(--glass);
+            backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 40px;
+            padding: 35px;
+            width: 320px;
             text-align: center;
-            border: 12px solid var(--p);
-            border-radius: 30px;
-            color: white;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+            color: var(--text-color);
+        }
+
+        .card-active-effect {
+            animation: kailashBreathe 2.2s infinite alternate ease-in-out;
+        }
+
+        @keyframes kailashBreathe {
+            to {
+                transform: translate(-50%, -50%) scale(1.03);
+                box-shadow: 0 0 55px var(--glow-color);
+            }
+        }
+
+        .mantra-title {
+            font-size: 28px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 5px;
+            text-shadow: 0 0 10px var(--glow-color);
+        }
+
+        .circle-container {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 20px auto;
+        }
+
+        .count-num {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 75px;
+            font-weight: 800;
+        }
+
+        svg {
+            transform: rotate(-90deg);
+        }
+
+        .progress-ring__circle {
+            transition: stroke-dashoffset 0.8s ease;
+            stroke: var(--accent);
+            filter: drop-shadow(0 0 8px var(--accent));
+        }
+
+        .goal-container {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            height: 8px;
+            border-radius: 10px;
+            margin-top: 15px;
+            overflow: hidden;
+        }
+
+        #goal-bar {
+            height: 100%;
+            width: 0%;
+            background: var(--accent);
+            transition: 0.5s;
+            box-shadow: 0 0 10px var(--accent);
+        }
+
+        .controls {
+            margin-top: 25px;
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            gap: 12px;
             align-items: center;
+        }
+
+        .main-btn {
+            padding: 14px 0;
+            border-radius: 50px;
+            border: none;
+            background: var(--btn-bg);
+            color: white;
+            font-weight: bold;
+            font-size: 20px;
+            cursor: pointer;
+            width: 100%;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            transition: 0.3s;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 6px 18px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 11px;
+            opacity: 0.7;
+            font-weight: bold;
+        }
+
+        .snowflake {
+            position: absolute;
+            background: var(--accent);
+            border-radius: 50%;
+            opacity: 0.6;
+            pointer-events: none;
+            z-index: 5;
         }
     </style>
 </head>
 
-<body id="main-body">
+<body>
 
-    <div class="top-row">
-        <div class="stat-card">🔥 Streak: <span id="streak">0</span></div>
-        <button class="mode-toggle" onclick="toggleMode()" id="mode-icon">🌙</button>
-        <div class="stat-card">🏆 Total: <span id="total-c">0</span></div>
-    </div>
+    <div id="bg-layer"></div>
 
-    <div class="theme-tabs">
-        <button class="t-btn active" id="btn-kailash" onclick="setT('kailash')">KAILASH</button>
-        <button class="t-btn" id="btn-vrindavan" onclick="setT('vrindavan')">VRINDAVAN</button>
-        <button class="t-btn" id="btn-ayodha" onclick="setT('ayodha')">AYODHYA</button>
-    </div>
+    <div class="glass-card" id="main-card">
+        <div class="mantra-title">Radha Radha</div>
+        <div style="font-size: 11px; opacity: 0.6; margin-top: -5px;">Eternal Peace Mode</div>
 
-    <div class="glass-card">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <label style="font-size:0.7rem; font-weight:600;">Reminder set :</label>
-            <input type="time" id="notif-time" onchange="saveNotif()"
-                style="border:none; background:rgba(255,255,255,0.1); color:var(--text-color); padding:5px; border-radius:8px;">
+        <div class="circle-container">
+            <svg height="200" width="200">
+                <circle stroke="rgba(128,128,128,0.1)" stroke-width="12" fill="transparent" r="90" cx="100" cy="100" />
+                <circle class="progress-ring__circle" id="progress-circle" stroke-width="12" stroke-dasharray="565.48"
+                    stroke-dashoffset="565.48" fill="transparent" r="90" cx="100" cy="100" />
+            </svg>
+            <div class="count-num" id="count-display">0</div>
         </div>
-        <h1 id="mantra-title"
-            style="font-family:'Crimson Pro',serif; font-size: 2.2rem; margin: 10px 0; color: var(--p);">Radhe Radhe
-        </h1>
-        <select id="mantra-select" onchange="changeMantra()">
-            <option value="Radha Radha" data-sound="radhe.mp3">Radha Radha</option>
-            <option value="Om Namah Shivay" data-sound="shivay.mp3">Om Namah Shivay</option>
-            <option value="Jay shree Ram" data-sound="ram.mp3">Jay shree Ram</option>
-            <option value="Hare Krishna" data-sound="krishna.mp3">Hare Krishna</option>
-        </select>
-        <div style="margin-top:12px; display:flex; justify-content:space-between; align-items:center;">
-            <label style="font-size:0.85rem; font-weight:600;">Goal (Min 108):</label>
-            <input type="number" id="goal-input" class="in-box" value="108" min="108" onchange="updateGoal()"
-                style="width:75px; margin:0;">
+
+        <div style="font-size: 12px; font-weight: bold; letter-spacing: 1px;">MALA PROGRESS</div>
+        <div class="goal-container">
+            <div id="goal-bar"></div>
         </div>
-        <div style="margin-top:15px; display:flex; align-items:center; gap:10px;">
-            <button onclick="toggleBG()" id="bgm-btn"
-                style="background:var(--p); color:white; border:none; padding:8px 12px; border-radius:10px;">🎵
-                OFF</button>
-            <input type="range" min="0" max="1" step="0.1" value="0.2" style="flex:1;" oninput="setVol(this.value)">
+        <div style="font-size: 11px; margin-top: 8px; opacity: 0.7;">
+            Maala Count: <span id="mala-count" style="color:var(--accent); font-weight:bold;">0</span>
         </div>
+
+        <div class="controls">
+            <button class="main-btn" id="start-btn" onclick="toggleJap()">Start Jaap</button>
+            <button class="theme-toggle" onclick="toggleTheme()">🌓 Change Theme</button>
+        </div>
+
+        <a href="javascript:void(0)" onclick="exitSession()"
+            style="color: var(--accent); text-decoration: none; font-size: 11px; display: block; margin-top: 25px; opacity: 0.5;">SAVE
+            & EXIT</a>
     </div>
 
-    <div class="counter-ring" id="circle">
-        <h2 id="count-num">0</h2>
-        <span style="font-size:0.8rem; font-weight:700; opacity:0.6;">GOAL: <span id="goal-val">108</span></span>
-    </div>
-
-    <button class="jap-btn" onclick="handleJap()">JAP KARO</button>
-
-    <div style="text-align: center; margin-top: 15px;">
-        <button class="hold-reset" id="reset-btn" onmousedown="startH()" onmouseup="stopH()" ontouchstart="startH()"
-            ontouchend="stopH()">🔄</button>
-        <p style="font-size:0.7rem; opacity:0.5; margin-top:5px;">Hold to Reset Today</p>
-    </div>
-
-    <div style="text-align: center; margin: 20px;">
-        <p style="font-size:0.9rem; margin-bottom:20px;">Automatic Jaap karva magu chho? </p>
-        <a href="auto-jap.html" class="auto-link">Auto-Jap Mode →</a>
-    </div>
-
-    <div class="glass-card" style="padding:20px;">
-        <span style="font-size:0.75rem; font-weight:700; opacity:0.6;">WEEKLY ACTIVITY</span>
-        <div class="report-grid" id="report-grid"></div>
-    </div>
-
-    <button class="share-btn" onclick="downloadBhaktiCard()">📤 SHARE BHAKTI CARD</button>
-
-    <div class="badge-row" style="margin-top:20px;">
-        <span class="badge" id="b1">🎖️</span> <span class="badge" id="b2">🛡️</span> <span class="badge"
-            id="b3">👑</span>
-    </div>
-
-    <div class="glass-card" style="margin-top:15px; font-style:italic; font-size:0.85rem;" id="gita-quote">
-        "Karma karo, fal ni chinta na karo. - Shree Krishna"
-    </div>
-
-    <footer style="margin-top:40px; text-align:center; padding:20px; opacity:0.7; font-size:0.8rem;">
-        DESIGNED & DEVELOPED BY <br> <b style="color:var(--p)">VISHVAM PRAJAPATI</b> <br>
-        <span style="font-family:'Crimson Pro', serif; font-size:1.1rem; color:var(--s)">🌸 Radhe Radhe 🌸</span>
-    </footer>
-
-    <div id="bhakti-card-hidden">
-        <h3>MANTRA JAP CERTIFICATE</h3>
-        <h1 id="card-mantra" style="font-size:3rem; color:var(--p);">Radhe Radhe</h1>
-        <p>Total Jap: <span id="card-total">0</span></p>
-        <p>Streak: <span id="card-streak">0</span> Days</p>
-    </div>
-
-    <audio id="mantra-audio"></audio>
-    <audio id="bg-audio" loop src="/static/audio/bansuri_bg.mp3"></audio>
+    <audio id="auto-audio" loop src="/static/audio/auto.mp3"></audio>
 
     <script>
-        let curr = 0, goal = 108, bgmOn = false, currentTheme = 'kailash', hTimer;
-        let total = 0;
-        const quotes = ["Karma karo, fal ni chinta na karo.", "Mann shant hoy to badhu jiti shakay.", "Radhe Radhe bolva thi mann shant thay."];
+        let audioPlayer = document.getElementById('auto-audio');
+        let count = 0;           // Aa session na current counts
+        let dbTotalCount = 0;    // Database mathi aavela total counts
+        let isPlaying = false;
+        let counterInterval;
 
-        // index.html na script ma replace karo
-        // index.html na script ma window.onload replace karo
-        window.onload = () => {
-    // 1. Database mathi fresh data fetch karo
-    fetch('/get_count')
-        .then(r => r.json())
-        .then(d => {
-            curr = d.current_count;
-            total = d.total_count;
-            let sCount = d.streak || 0; // Database mathi streak aavshe
+        // 1. Page load thay tyare Database mathi latest counts lai aavo
+        document.addEventListener('DOMContentLoaded', async () => {
+            // LocalStorage mathi turant data batavo (Optional for UI speed)
+            count = parseInt(localStorage.getItem('jap_curr')) || 0;
+            document.getElementById('count-display').innerText = count;
+            document.getElementById('mala-count').innerText = Math.floor(count / 108);
+            updateProgress();
 
-            // 2. UI Update (No checkS call needed)
-            document.getElementById('count-num').innerText = curr;
-            document.getElementById('total-c').innerText = total;
-            document.getElementById('streak').innerText = sCount; 
-
-            // 3. LocalStorage update (fakt offline backup mate)
-            localStorage.setItem('jap_total', total);
-            localStorage.setItem('jap_curr', curr);
-            localStorage.setItem('strk', sCount); 
-
-            updateReport(d.history, d.today);
-        })
-        .catch(err => {
-            console.error("DB Error:", err);
-            // Jo offline hoy to local storage vaparo
-            curr = parseInt(localStorage.getItem('jap_curr')) || 0;
-            total = parseInt(localStorage.getItem('jap_total')) || 0;
-            let sCount = parseInt(localStorage.getItem('strk')) || 0;
-            
-            document.getElementById('count-num').innerText = curr;
-            document.getElementById('total-c').innerText = total;
-            document.getElementById('streak').innerText = sCount;
+            await loadDataFromDB();
         });
 
-    document.getElementById('notif-time').value = localStorage.getItem('pTime') || "";
-    
-    // Theme setup
-    const isDark = localStorage.getItem('darkMode') === 'true';
-    if (!isDark) {
-        document.body.classList.add('light-mode');
-        document.getElementById('mode-icon').innerText = "☀️";
-    }
-    
-    changeMantra();
-    setT(currentTheme);
-};
+        async function loadDataFromDB() {
+            try {
+                const response = await fetch('/get_count');
+                const d = await response.json();
 
-// ... toggleMode function same raheshe ...
-function toggleMode() {
-    const isLight = document.body.classList.toggle('light-mode');
-    localStorage.setItem('darkMode', !isLight);
-    document.getElementById('mode-icon').innerText = isLight ? "☀️" : "🌙";
-    setT(currentTheme);
-}
-function setT(t) {
-    currentTheme = t;
-    // Buttons active class update
-    document.querySelectorAll('.t-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById('btn-' + t).classList.add('active');
+                if (d.current_count !== undefined) {
+                    count = parseInt(d.current_count);
+                    dbTotalCount = parseInt(d.total_count); // Database no total count store karo
 
-    const isLight = document.body.classList.contains('light-mode');
-    const root = document.documentElement;
-
-    if (t === 'kailash') {
-        if (isLight) {
-            root.style.setProperty('--p', '#0077b6');
-            root.style.setProperty('--bg-grad', 'linear-gradient(135deg, #e0f2f1 0%, #b2ebf2 100%)', 'important');
-        } else {
-            root.style.setProperty('--p', '#00b4d8');
-            root.style.setProperty('--bg-grad', 'linear-gradient(135deg, #00101a 0%, #012a4a 50%, #01497c 100%)', 'important');
-        }
-    } else if (t === 'vrindavan') {
-        if (isLight) {
-            root.style.setProperty('--p', '#2e7d32');
-            root.style.setProperty('--bg-grad', 'linear-gradient(135deg, #f1f8e9 0%, #dcedc8 100%)', 'important');
-        } else {
-            root.style.setProperty('--p', '#4caf50');
-            root.style.setProperty('--bg-grad', 'linear-gradient(135deg, #0a1a0a 0%, #1b3022 50%, #2d5a27 100%)', 'important');
-        }
-    } else if (t === 'ayodha') {
-        if (isLight) {
-            root.style.setProperty('--p', '#ef6c00');
-            root.style.setProperty('--bg-grad', 'linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%)', 'important');
-        } else {
-            root.style.setProperty('--p', '#ff9800');
-            root.style.setProperty('--bg-grad', 'linear-gradient(135deg, #1a0f00 0%, #3e2723 50%, #5d4037 100%)', 'important');
-        }
-    }
-}
-
-        function handleJap() {
-            curr++; total++; updateUI();
-            const a = document.getElementById('mantra-audio');
-            a.currentTime = 0; a.play().catch(() => { });
-            const c = document.getElementById('circle');
-            c.style.transform = "scale(1.1)"; setTimeout(() => c.style.transform = "scale(1)", 100);
-            if (curr % goal === 0) confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-            if (navigator.vibrate) navigator.vibrate(curr % goal === 0 ? 300 : 50);
-            save();
-        }
-
-        function updateUI() {
-            document.getElementById('count-num').innerText = curr;
-            document.getElementById('total-c').innerText = total;
-            document.getElementById('goal-val').innerText = goal;
-            if (total >= 108) document.getElementById('b1').classList.add('active');
-            if (total >= 1000) document.getElementById('b2').classList.add('active');
-            if (total >= 5000) document.getElementById('b3').classList.add('active');
-        }
-
-        function updateReport(history, today) {
-            const grid = document.getElementById('report-grid');
-            grid.innerHTML = '';
-            for (let i = 0; i < 7; i++) {
-                let d = new Date(); d.setDate(d.getDate() - (6 - i));
-                let dStr = d.toISOString().split('T')[0];
-                let val = (dStr === today) ? curr : (history[dStr] || 0);
-                let h = Math.min((val / goal) * 60, 60);
-                grid.innerHTML += `<div class="bar-wrap" style="display:flex; flex-direction:column; align-items:center; flex:1;"><div class="bar" style="height:${h}px"></div><span style="font-size:0.6rem; opacity:0.6;">${d.toLocaleDateString('en-US', { weekday: 'short' })}</span></div>`;
+                    document.getElementById('count-display').innerText = count;
+                    document.getElementById('mala-count').innerText = Math.floor(count / 108);
+                    updateProgress();
+                }
+            } catch (err) {
+                console.error("Data load karva ma bhul chhe:", err);
             }
         }
 
-        function save() {
-            fetch('/update_count', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ current_count: curr, total_count: total }) });
-            localStorage.setItem('jap_total', total); localStorage.setItem('jap_curr', curr);
-        }
+        // 2. Jaap Sharu karvanu function (Local Audio sathe)
+        function startJap() {
+            if (isPlaying) return;
 
-        function startH() {
-            document.getElementById('reset-btn').classList.add('active');
-            hTimer = setTimeout(() => {
-                if (confirm("Aaje karela jap reset karva chhe?")) { curr = 0; updateUI(); save(); }
-                stopH();
-            }, 1500);
-        }
-        function stopH() { document.getElementById('reset-btn').classList.remove('active'); clearTimeout(hTimer); }
-
-        function changeMantra() {
-            const s = document.getElementById('mantra-select');
-            document.getElementById('mantra-title').innerText = s.value;
-            document.getElementById('mantra-audio').src = "/static/audio/" + s.options[s.selectedIndex].getAttribute('data-sound');
-        }
-
-        function toggleBG() {
-            const bg = document.getElementById('bg-audio');
-            bgmOn ? bg.pause() : bg.play().catch(() => { });
-            bgmOn = !bgmOn;
-            document.getElementById('bgm-btn').innerText = bgmOn ? "🎵 ON" : "🎵 OFF";
-        }
-
-        function setVol(v) { document.getElementById('bg-audio').volume = v; }
-        function updateGoal() { goal = Math.max(108, document.getElementById('goal-input').value); updateUI(); }
-        function saveNotif() { localStorage.setItem('pTime', document.getElementById('notif-time').value); Notification.requestPermission(); }
-        function checkNotif() {
-            const setT = localStorage.getItem('pTime');
-            const now = new Date();
-            const nowT = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
-            if (setT === nowT && Notification.permission === "granted") {
-                new Notification("Radhe Radhe!", { body: quotes[Math.floor(Math.random() * quotes.length)] });
+            // Audio play karo
+            if (audioPlayer) {
+                audioPlayer.play().catch(err => console.error("Audio play error:", err));
             }
+
+            isPlaying = true;
+            document.getElementById('main-card').classList.add('card-active-effect');
+            document.getElementById('start-btn').innerText = "Pause Session";
+
+            counterInterval = setInterval(() => {
+                count++;
+                // Navo total = Database no total + current session ma jetla vadhiya te
+                // Note: Ahi logic badlavo padshe jethi count double na thay
+                // Pan saraltat mate, dar vakhte live update kariye:
+
+                document.getElementById('count-display').innerText = count;
+                localStorage.setItem('jap_curr', count);
+
+                // Dar 1 count par database update karvu hoy to (Optional):
+                // saveToDB(count, dbTotalCount + 1); 
+
+                if (count % 108 === 0) {
+                    document.getElementById('mala-count').innerText = Math.floor(count / 108);
+                    confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                }
+
+                updateProgress();
+                spawnSnowflake();
+            }, 850); // Tamari audio file ni speed mujab aane adjust kari shako (e.g. 1000ms)
         }
 
-        function downloadBhaktiCard() {
-            document.getElementById('card-mantra').innerText = document.getElementById('mantra-select').value;
-            document.getElementById('card-total').innerText = total;
-            document.getElementById('card-streak').innerText = document.getElementById('streak').innerText;
-            html2canvas(document.getElementById('bhakti-card-hidden')).then(canvas => {
-                const link = document.createElement('a'); link.download = 'BhaktiCard.png'; link.href = canvas.toDataURL(); link.click();
+
+
+        function stopJap() {
+            isPlaying = false;
+            if (audioPlayer) audioPlayer.pause();
+            document.getElementById('main-card').classList.remove('card-active-effect');
+            clearInterval(counterInterval);
+            document.getElementById('start-btn').innerText = "Resume Jaap";
+
+            // Stop thay tyare final save
+            saveToDB();
+        }
+
+        // auto-jap.html ma saveToDB function replace karo
+        function saveToDB() {
+            // Session માં જેટલા જાપ વધ્યા તેટલા જ ટોટલમાં ઉમેરો
+            const sessionIncrease = count - (parseInt(localStorage.getItem('jap_curr_at_start')) || 0);
+            const finalTotal = dbTotalCount + sessionIncrease;
+
+            fetch('/update_count', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    current_count: count,
+                    total_count: finalTotal
+                })
+            }).then(res => res.json()).then(data => {
+                console.log("Synced with Supabase");
             });
         }
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
-                    .then(reg => console.log('Service Worker Registered!'))
-                    .catch(err => console.log('Registration failed:', err));
-            });
+
+        // loadDataFromDB ma aa line umero
+        async function loadDataFromDB() {
+            try {
+                const response = await fetch('/get_count');
+                const d = await response.json();
+                if (d.current_count !== undefined) {
+                    count = parseInt(d.current_count);
+                    dbTotalCount = parseInt(d.total_count);
+
+                    // Session sharu thaya pehla no count save karo jethi calculation sahi thay
+                    localStorage.setItem('jap_curr_at_start', count);
+
+                    document.getElementById('count-display').innerText = count;
+                    document.getElementById('mala-count').innerText = Math.floor(count / 108);
+                    updateProgress();
+                }
+            } catch (err) { console.log(err); }
         }
+        function toggleJap() {
+            if (isPlaying) stopJap(); else startJap();
+        }
+
+        // 4. Exit karva mate
+        function exitSession() {
+            stopJap();
+            setTimeout(() => {
+                window.location.href = '/';
+            }, 500);
+        }
+
+        // UI Progress Functions
+        function updateProgress() {
+            const circle = document.getElementById('progress-circle');
+            const bar = document.getElementById('goal-bar');
+            const p = (count % 108) / 108;
+            const offset = 565.48 - (p * 565.48);
+            if (circle) circle.style.strokeDashoffset = offset;
+            if (bar) bar.style.width = (p * 100) + "%";
+        }
+
+        function spawnSnowflake() {
+            const s = document.createElement('div');
+            s.className = 'snowflake';
+            s.style.left = Math.random() * 100 + "vw";
+            s.style.top = "-10px";
+            let size = Math.random() * 5 + 2;
+            s.style.width = size + "px"; s.style.height = size + "px";
+            document.body.appendChild(s);
+            s.animate([{ transform: 'translateY(0)', opacity: 0.6 }, { transform: 'translateY(110vh)', opacity: 0 }], { duration: 4000 });
+            setTimeout(() => s.remove(), 4000);
+        }
+
+        function toggleTheme() { document.body.classList.toggle('light-mode'); }
     </script>
 </body>
 
