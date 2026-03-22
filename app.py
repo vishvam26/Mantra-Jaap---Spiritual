@@ -90,5 +90,12 @@ def update_count():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+
+@app.route('/sw.js')
+def serve_sw():
+    response = make_response(send_from_directory('static', 'sw.js'))
+    response.headers['Content-Type'] = 'application/javascript'
+    return response
+
 if __name__ == '__main__':
     app.run(debug=True)
