@@ -13,13 +13,10 @@
 
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Crimson+Pro:wght@700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Crimson+Pro:wght@700&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            /* Default: Kailash Dark Theme */
             --bg-grad: linear-gradient(135deg, #00101a 0%, #012a4a 50%, #01497c 100%);
             --glass: rgba(255, 255, 255, 0.12);
             --glow-color: rgba(225, 245, 254, 0.4);
@@ -29,13 +26,11 @@
             --s: #90e0ef;
         }
 
-/* Aa line replace karo */
-.light-mode {
-    --glass: rgba(0, 0, 0, 0.05);
-    --text-color: #2c3e50;
-    --glow-color: rgba(0, 0, 0, 0.1);
-    /* --bg-grad ahi fix nathi, jethi setT() tene badli shake */
-}
+        .light-mode {
+            --glass: rgba(0, 0, 0, 0.05);
+            --text-color: #2c3e50;
+            --glow-color: rgba(0, 0, 0, 0.1);
+        }
 
         body {
             margin: 0;
@@ -62,17 +57,6 @@
             align-items: center;
         }
 
-        .mode-toggle {
-            background: var(--glass);
-            border: none;
-            color: var(--text-color);
-            padding: 8px 12px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 1.2rem;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        }
-
         .stat-card {
             background: var(--glass);
             padding: 8px 15px;
@@ -82,22 +66,14 @@
             backdrop-filter: blur(10px);
         }
 
-        .badge-row {
-            display: flex;
-            gap: 10px;
-        }
-
-        .badge {
-            font-size: 1.5rem;
-            filter: grayscale(1);
-            opacity: 0.2;
-            transition: 0.5s;
-        }
-
-        .badge.active {
-            filter: grayscale(0);
-            opacity: 1;
-            transform: scale(1.2);
+        .mode-toggle {
+            background: var(--glass);
+            border: none;
+            color: var(--text-color);
+            padding: 8px 12px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
         }
 
         .theme-tabs {
@@ -152,15 +128,7 @@
             background: var(--glass);
             margin: 15px 0;
             box-shadow: 0 0 30px var(--glow-color);
-            animation: breathe 3s infinite alternate ease-in-out;
             position: relative;
-        }
-
-        @keyframes breathe {
-            to {
-                box-shadow: 0 0 50px var(--glow-color);
-                transform: scale(1.02);
-            }
         }
 
         #count-num {
@@ -168,7 +136,6 @@
             font-weight: 800;
             color: var(--accent);
             margin: 0;
-            text-shadow: 0 0 15px var(--glow-color);
         }
 
         .jap-btn {
@@ -183,12 +150,9 @@
             cursor: pointer;
             font-weight: 700;
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-            transition: 0.2s;
         }
 
-        .jap-btn:active {
-            transform: scale(0.95);
-        }
+        .jap-btn:active { transform: scale(0.95); }
 
         .hold-reset {
             width: 55px;
@@ -200,17 +164,7 @@
             cursor: pointer;
             position: relative;
             overflow: hidden;
-        }
-
-        .hold-reset.active::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(239, 68, 68, 0.2);
-            transition: 1.5s linear;
+            margin-top: 15px;
         }
 
         .report-grid {
@@ -228,30 +182,15 @@
             border-radius: 5px 5px 0 0;
             min-height: 4px;
             transition: 0.5s;
-            box-shadow: 0 0 10px var(--p);
         }
 
-        select,
-        .in-box {
+        select, .in-box {
             width: 100%;
             padding: 12px;
             border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
             background: rgba(0, 0, 0, 0.2);
             color: var(--text-color);
-        }
-
-        .share-btn {
-            margin-top: 20px;
-            background: var(--p);
-            color: white;
-            border: none;
-            padding: 15px 25px;
-            border-radius: 12px;
-            font-weight: 700;
-            cursor: pointer;
-            width: 100%;
-            max-width: 320px;
+            border: 1px solid rgba(255,255,255,0.1);
         }
 
         .auto-link {
@@ -262,9 +201,29 @@
             border-radius: 50px;
             border: 1px solid var(--p);
             font-size: 0.9rem;
+            font-weight: bold;
         }
 
-        /* Hidden Bhakti Card */
+        .badge-row {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+            justify-content: center;
+        }
+
+        .badge {
+            font-size: 1.5rem;
+            filter: grayscale(1);
+            opacity: 0.3;
+            transition: 0.5s;
+        }
+
+        .badge.active {
+            filter: grayscale(0);
+            opacity: 1;
+            transform: scale(1.2);
+        }
+
         #bhakti-card-hidden {
             position: absolute;
             left: -9999px;
@@ -273,13 +232,13 @@
             background: var(--bg-grad);
             padding: 40px;
             text-align: center;
-            border: 12px solid var(--p);
             border-radius: 30px;
             color: white;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
+            border: 10px solid var(--p);
         }
     </style>
 </head>
@@ -299,14 +258,12 @@
     </div>
 
     <div class="glass-card">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <label style="font-size:0.7rem; font-weight:600;">Reminder set :</label>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
+            <label style="font-size:0.7rem; font-weight:600;">Reminder:</label>
             <input type="time" id="notif-time" onchange="saveNotif()"
                 style="border:none; background:rgba(255,255,255,0.1); color:var(--text-color); padding:5px; border-radius:8px;">
         </div>
-        <h1 id="mantra-title"
-            style="font-family:'Crimson Pro',serif; font-size: 2.2rem; margin: 10px 0; color: var(--p);">Radhe Radhe
-        </h1>
+        <h1 id="mantra-title" style="font-family:'Crimson Pro',serif; font-size: 2.2rem; margin: 10px 0; color: var(--p);">Radha Radha</h1>
         <select id="mantra-select" onchange="changeMantra()">
             <option value="Radha Radha" data-sound="radhe.mp3">Radha Radha</option>
             <option value="Om Namah Shivay" data-sound="shivay.mp3">Om Namah Shivay</option>
@@ -314,14 +271,11 @@
             <option value="Hare Krishna" data-sound="krishna.mp3">Hare Krishna</option>
         </select>
         <div style="margin-top:12px; display:flex; justify-content:space-between; align-items:center;">
-            <label style="font-size:0.85rem; font-weight:600;">Goal (Min 108):</label>
-            <input type="number" id="goal-input" class="in-box" value="108" min="108" onchange="updateGoal()"
-                style="width:75px; margin:0;">
+            <label style="font-size:0.85rem; font-weight:600;">Goal:</label>
+            <input type="number" id="goal-input" class="in-box" value="108" min="108" onchange="updateGoal()" style="width:75px; margin:0;">
         </div>
         <div style="margin-top:15px; display:flex; align-items:center; gap:10px;">
-            <button onclick="toggleBG()" id="bgm-btn"
-                style="background:var(--p); color:white; border:none; padding:8px 12px; border-radius:10px;">🎵
-                OFF</button>
+            <button onclick="toggleBG()" id="bgm-btn" style="background:var(--p); color:white; border:none; padding:8px 12px; border-radius:10px;">🎵 OFF</button>
             <input type="range" min="0" max="1" step="0.1" value="0.2" style="flex:1;" oninput="setVol(this.value)">
         </div>
     </div>
@@ -333,27 +287,26 @@
 
     <button class="jap-btn" onclick="handleJap()">JAP KARO</button>
 
-    <div style="text-align: center; margin-top: 15px;">
-        <button class="hold-reset" id="reset-btn" onmousedown="startH()" onmouseup="stopH()" ontouchstart="startH()"
-            ontouchend="stopH()">🔄</button>
+    <div style="text-align: center;">
+        <button class="hold-reset" id="reset-btn" onmousedown="startH()" onmouseup="stopH()" ontouchstart="startH()" ontouchend="stopH()">🔄</button>
         <p style="font-size:0.7rem; opacity:0.5; margin-top:5px;">Hold to Reset Today</p>
     </div>
 
     <div style="text-align: center; margin: 20px;">
-        <p style="font-size:0.9rem; margin-bottom:20px;">Automatic Jaap karva magu chho? </p>
         <a href="auto-jap.html" class="auto-link">Auto-Jap Mode →</a>
     </div>
 
-    <div class="glass-card" style="padding:20px;">
+    <div class="glass-card">
         <span style="font-size:0.75rem; font-weight:700; opacity:0.6;">WEEKLY ACTIVITY</span>
         <div class="report-grid" id="report-grid"></div>
     </div>
 
-    <button class="share-btn" onclick="downloadBhaktiCard()">📤 SHARE BHAKTI CARD</button>
+    <button class="jap-btn" onclick="downloadBhaktiCard()" style="font-size: 1rem; padding: 12px; margin-top: 10px;">📤 SHARE CARD</button>
 
-    <div class="badge-row" style="margin-top:20px;">
-        <span class="badge" id="b1">🎖️</span> <span class="badge" id="b2">🛡️</span> <span class="badge"
-            id="b3">👑</span>
+    <div class="badge-row">
+        <span class="badge" id="b1">🎖️</span>
+        <span class="badge" id="b2">🛡️</span>
+        <span class="badge" id="b3">👑</span>
     </div>
 
     <div class="glass-card" style="margin-top:15px; font-style:italic; font-size:0.85rem;" id="gita-quote">
@@ -361,13 +314,13 @@
     </div>
 
     <footer style="margin-top:40px; text-align:center; padding:20px; opacity:0.7; font-size:0.8rem;">
-        DESIGNED & DEVELOPED BY <br> <b style="color:var(--p)">VISHVAM PRAJAPATI</b> <br>
+        DESIGNED BY <b style="color:var(--p)">VISHVAM PRAJAPATI</b> <br>
         <span style="font-family:'Crimson Pro', serif; font-size:1.1rem; color:var(--s)">🌸 Radhe Radhe 🌸</span>
     </footer>
 
     <div id="bhakti-card-hidden">
         <h3>MANTRA JAP CERTIFICATE</h3>
-        <h1 id="card-mantra" style="font-size:3rem; color:var(--p);">Radhe Radhe</h1>
+        <h1 id="card-mantra" style="font-size:3rem; color:var(--p);">Radha Radha</h1>
         <p>Total Jap: <span id="card-total">0</span></p>
         <p>Streak: <span id="card-streak">0</span> Days</p>
     </div>
@@ -376,151 +329,74 @@
     <audio id="bg-audio" loop src="/static/audio/bansuri_bg.mp3"></audio>
 
     <script>
-        let curr = 0, goal = 108, bgmOn = false, currentTheme = 'kailash', hTimer;
-        let total = 0;
+        // 1. User ID Logic
+        let userId = localStorage.getItem('jap_user_id');
+        if (!userId) {
+            userId = 'u_' + Math.random().toString(36).substr(2, 9) + Date.now();
+            localStorage.setItem('jap_user_id', userId);
+        }
+
+        let curr = 0, total = 0, goal = 108, bgmOn = false, currentTheme = 'kailash', hTimer;
         const quotes = ["Karma karo, fal ni chinta na karo.", "Mann shant hoy to badhu jiti shakay.", "Radhe Radhe bolva thi mann shant thay."];
+        const getBaseUrl = () => window.location.origin;
 
-        // index.html na script ma replace karo
-        // index.html na script ma window.onload replace karo
         window.onload = () => {
-    // 1. Database mathi fresh data fetch karo
-    fetch('/get_count')
-        .then(r => r.json())
-        .then(d => {
-            curr = d.current_count;
-            total = d.total_count;
-            let sCount = d.streak || 0; // Database mathi streak aavshe
+            fetch(`${getBaseUrl()}/get_count?user_id=${userId}`)
+                .then(r => r.json())
+                .then(d => {
+                    curr = d.current_count;
+                    total = d.total_count;
+                    document.getElementById('count-num').innerText = curr;
+                    document.getElementById('total-c').innerText = total;
+                    document.getElementById('streak').innerText = d.streak || 0;
+                    updateUI();
+                    updateReport(d.history, d.today);
+                });
 
-            // 2. UI Update (No checkS call needed)
-            document.getElementById('count-num').innerText = curr;
-            document.getElementById('total-c').innerText = total;
-            document.getElementById('streak').innerText = sCount; 
-
-            // 3. LocalStorage update (fakt offline backup mate)
-            localStorage.setItem('jap_total', total);
-            localStorage.setItem('jap_curr', curr);
-            localStorage.setItem('strk', sCount); 
-
-            updateReport(d.history, d.today);
-        })
-        .catch(err => {
-            console.error("DB Error:", err);
-            // Jo offline hoy to local storage vaparo
-            curr = parseInt(localStorage.getItem('jap_curr')) || 0;
-            total = parseInt(localStorage.getItem('jap_total')) || 0;
-            let sCount = parseInt(localStorage.getItem('strk')) || 0;
+            const darkModeSaved = localStorage.getItem('darkMode');
+            if (darkModeSaved === 'false') {
+                document.body.classList.add('light-mode');
+                document.getElementById('mode-icon').innerText = "☀️";
+            }
             
-            document.getElementById('count-num').innerText = curr;
-            document.getElementById('total-c').innerText = total;
-            document.getElementById('streak').innerText = sCount;
-        });
+            document.getElementById('notif-time').value = localStorage.getItem('pTime') || "";
+            changeMantra();
+            setT(currentTheme);
+            setInterval(checkNotif, 60000);
+        };
 
-    document.getElementById('notif-time').value = localStorage.getItem('pTime') || "";
-    
-    // Theme setup
-    const isDark = localStorage.getItem('darkMode') === 'true';
-    if (!isDark) {
-        document.body.classList.add('light-mode');
-        document.getElementById('mode-icon').innerText = "☀️";
-    }
-    
-    changeMantra();
-    setT(currentTheme);
-};
-
-// ... toggleMode function same raheshe ...
-function toggleMode() {
-    const isLight = document.body.classList.toggle('light-mode');
-    localStorage.setItem('darkMode', !isLight);
-    document.getElementById('mode-icon').innerText = isLight ? "☀️" : "🌙";
-    setT(currentTheme);
-}
-function setT(t) {
-    currentTheme = t;
-    // Buttons active class update
-    document.querySelectorAll('.t-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById('btn-' + t).classList.add('active');
-
-    const isLight = document.body.classList.contains('light-mode');
-    const root = document.documentElement;
-
-    if (t === 'kailash') {
-        if (isLight) {
-            root.style.setProperty('--p', '#0077b6');
-            root.style.setProperty('--bg-grad', 'linear-gradient(135deg, #e0f2f1 0%, #b2ebf2 100%)', 'important');
-        } else {
-            root.style.setProperty('--p', '#00b4d8');
-            root.style.setProperty('--bg-grad', 'linear-gradient(135deg, #00101a 0%, #012a4a 50%, #01497c 100%)', 'important');
+        function toggleMode() {
+            const isLight = document.body.classList.toggle('light-mode');
+            localStorage.setItem('darkMode', !isLight);
+            document.getElementById('mode-icon').innerText = isLight ? "☀️" : "🌙";
+            setT(currentTheme);
         }
-    } else if (t === 'vrindavan') {
-        if (isLight) {
-            root.style.setProperty('--p', '#2e7d32');
-            root.style.setProperty('--bg-grad', 'linear-gradient(135deg, #f1f8e9 0%, #dcedc8 100%)', 'important');
-        } else {
-            root.style.setProperty('--p', '#4caf50');
-            root.style.setProperty('--bg-grad', 'linear-gradient(135deg, #0a1a0a 0%, #1b3022 50%, #2d5a27 100%)', 'important');
+
+        function setT(t) {
+            currentTheme = t;
+            document.querySelectorAll('.t-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('btn-' + t).classList.add('active');
+            const isLight = document.body.classList.contains('light-mode');
+            const root = document.documentElement;
+
+            if (t === 'kailash') {
+                root.style.setProperty('--p', isLight ? '#0077b6' : '#00b4d8');
+                root.style.setProperty('--bg-grad', isLight ? 'linear-gradient(135deg, #e0f2f1 0%, #b2ebf2 100%)' : 'linear-gradient(135deg, #00101a 0%, #012a4a 50%, #01497c 100%)');
+            } else if (t === 'vrindavan') {
+                root.style.setProperty('--p', isLight ? '#2e7d32' : '#4caf50');
+                root.style.setProperty('--bg-grad', isLight ? 'linear-gradient(135deg, #f1f8e9 0%, #dcedc8 100%)' : 'linear-gradient(135deg, #0a1a0a 0%, #1b3022 50%, #2d5a27 100%)');
+            } else if (t === 'ayodha') {
+                root.style.setProperty('--p', isLight ? '#ef6c00' : '#ff9800');
+                root.style.setProperty('--bg-grad', isLight ? 'linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%)' : 'linear-gradient(135deg, #1a0f00 0%, #3e2723 50%, #5d4037 100%)');
+            }
         }
-    } else if (t === 'ayodha') {
-        if (isLight) {
-            root.style.setProperty('--p', '#ef6c00');
-            root.style.setProperty('--bg-grad', 'linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%)', 'important');
-        } else {
-            root.style.setProperty('--p', '#ff9800');
-            root.style.setProperty('--bg-grad', 'linear-gradient(135deg, #1a0f00 0%, #3e2723 50%, #5d4037 100%)', 'important');
-        }
-    }
-}
 
         function handleJap() {
             curr++; total++; updateUI();
             const a = document.getElementById('mantra-audio');
             a.currentTime = 0; a.play().catch(() => { });
-            const c = document.getElementById('circle');
-            c.style.transform = "scale(1.1)"; setTimeout(() => c.style.transform = "scale(1)", 100);
-            if (curr % goal === 0) confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-            if (navigator.vibrate) navigator.vibrate(curr % goal === 0 ? 300 : 50);
+            if (curr % goal === 0) confetti();
             save();
-        }
-
-        function updateUI() {
-            document.getElementById('count-num').innerText = curr;
-            document.getElementById('total-c').innerText = total;
-            document.getElementById('goal-val').innerText = goal;
-            if (total >= 108) document.getElementById('b1').classList.add('active');
-            if (total >= 1000) document.getElementById('b2').classList.add('active');
-            if (total >= 5000) document.getElementById('b3').classList.add('active');
-        }
-
-        function updateReport(history, today) {
-            const grid = document.getElementById('report-grid');
-            grid.innerHTML = '';
-            for (let i = 0; i < 7; i++) {
-                let d = new Date(); d.setDate(d.getDate() - (6 - i));
-                let dStr = d.toISOString().split('T')[0];
-                let val = (dStr === today) ? curr : (history[dStr] || 0);
-                let h = Math.min((val / goal) * 60, 60);
-                grid.innerHTML += `<div class="bar-wrap" style="display:flex; flex-direction:column; align-items:center; flex:1;"><div class="bar" style="height:${h}px"></div><span style="font-size:0.6rem; opacity:0.6;">${d.toLocaleDateString('en-US', { weekday: 'short' })}</span></div>`;
-            }
-        }
-
-        function save() {
-            fetch('/update_count', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ current_count: curr, total_count: total }) });
-            localStorage.setItem('jap_total', total); localStorage.setItem('jap_curr', curr);
-        }
-
-        function startH() {
-            document.getElementById('reset-btn').classList.add('active');
-            hTimer = setTimeout(() => {
-                if (confirm("Aaje karela jap reset karva chhe?")) { curr = 0; updateUI(); save(); }
-                stopH();
-            }, 1500);
-        }
-        function stopH() { document.getElementById('reset-btn').classList.remove('active'); clearTimeout(hTimer); }
-
-        function changeMantra() {
-            const s = document.getElementById('mantra-select');
-            document.getElementById('mantra-title').innerText = s.value;
-            document.getElementById('mantra-audio').src = "/static/audio/" + s.options[s.selectedIndex].getAttribute('data-sound');
         }
 
         function toggleBG() {
@@ -531,8 +407,53 @@ function setT(t) {
         }
 
         function setVol(v) { document.getElementById('bg-audio').volume = v; }
+
+        function updateUI() {
+            document.getElementById('count-num').innerText = curr;
+            document.getElementById('total-c').innerText = total;
+            document.getElementById('goal-val').innerText = goal;
+            if (total >= 108) document.getElementById('b1').classList.add('active');
+            if (total >= 1000) document.getElementById('b2').classList.add('active');
+            if (total >= 5000) document.getElementById('b3').classList.add('active');
+        }
+
+        function save() {
+            fetch(`${getBaseUrl()}/update_count`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_id: userId, current_count: curr, total_count: total })
+            });
+        }
+
+        function startH() {
+            document.getElementById('reset-btn').style.transform = "scale(0.9)";
+            hTimer = setTimeout(() => {
+                if (confirm("Aaje karela jap reset karva chhe?")) { curr = 0; updateUI(); save(); }
+            }, 1500);
+        }
+        function stopH() { document.getElementById('reset-btn').style.transform = "scale(1)"; clearTimeout(hTimer); }
+
+        function updateReport(history, today) {
+            const grid = document.getElementById('report-grid');
+            grid.innerHTML = '';
+            for (let i = 0; i < 7; i++) {
+                let d = new Date(); d.setDate(d.getDate() - (6 - i));
+                let dStr = d.toISOString().split('T')[0];
+                let val = (dStr === today) ? curr : (history[dStr] || 0);
+                let h = Math.min((val / goal) * 60, 60);
+                grid.innerHTML += `<div style="display:flex; flex-direction:column; align-items:center; flex:1;"><div class="bar" style="height:${h}px"></div><span style="font-size:0.6rem; opacity:0.6;">${d.toLocaleDateString('en', { weekday: 'short' })}</span></div>`;
+            }
+        }
+
+        function changeMantra() {
+            const s = document.getElementById('mantra-select');
+            document.getElementById('mantra-title').innerText = s.value;
+            document.getElementById('mantra-audio').src = "/static/audio/" + s.options[s.selectedIndex].getAttribute('data-sound');
+        }
+
         function updateGoal() { goal = Math.max(108, document.getElementById('goal-input').value); updateUI(); }
         function saveNotif() { localStorage.setItem('pTime', document.getElementById('notif-time').value); Notification.requestPermission(); }
+        
         function checkNotif() {
             const setT = localStorage.getItem('pTime');
             const now = new Date();
@@ -548,13 +469,6 @@ function setT(t) {
             document.getElementById('card-streak').innerText = document.getElementById('streak').innerText;
             html2canvas(document.getElementById('bhakti-card-hidden')).then(canvas => {
                 const link = document.createElement('a'); link.download = 'BhaktiCard.png'; link.href = canvas.toDataURL(); link.click();
-            });
-        }
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
-                    .then(reg => console.log('Service Worker Registered!'))
-                    .catch(err => console.log('Registration failed:', err));
             });
         }
     </script>
