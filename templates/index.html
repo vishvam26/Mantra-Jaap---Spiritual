@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Mantra Jaap - Spiritual</title>
+    <title>Mantra Jaap - Spiritual Tracker</title>
 
     <link rel="manifest" href="/manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -17,6 +17,7 @@
 
     <style>
         :root {
+            /* Default: Kailash Dark Theme */
             --bg-grad: linear-gradient(135deg, #00101a 0%, #012a4a 50%, #01497c 100%);
             --glass: rgba(255, 255, 255, 0.12);
             --glow-color: rgba(225, 245, 254, 0.4);
@@ -74,6 +75,7 @@
             border-radius: 50%;
             cursor: pointer;
             font-size: 1.2rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
 
         .theme-tabs {
@@ -128,7 +130,15 @@
             background: var(--glass);
             margin: 15px 0;
             box-shadow: 0 0 30px var(--glow-color);
+            animation: breathe 3s infinite alternate ease-in-out;
             position: relative;
+        }
+
+        @keyframes breathe {
+            to {
+                box-shadow: 0 0 50px var(--glow-color);
+                transform: scale(1.02);
+            }
         }
 
         #count-num {
@@ -136,6 +146,7 @@
             font-weight: 800;
             color: var(--accent);
             margin: 0;
+            text-shadow: 0 0 15px var(--glow-color);
         }
 
         .jap-btn {
@@ -150,9 +161,12 @@
             cursor: pointer;
             font-weight: 700;
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            transition: 0.2s;
         }
 
-        .jap-btn:active { transform: scale(0.95); }
+        .jap-btn:active {
+            transform: scale(0.95);
+        }
 
         .hold-reset {
             width: 55px;
@@ -182,15 +196,17 @@
             border-radius: 5px 5px 0 0;
             min-height: 4px;
             transition: 0.5s;
+            box-shadow: 0 0 10px var(--p);
         }
 
-        select, .in-box {
+        select,
+        .in-box {
             width: 100%;
             padding: 12px;
             border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
             background: rgba(0, 0, 0, 0.2);
             color: var(--text-color);
-            border: 1px solid rgba(255,255,255,0.1);
         }
 
         .auto-link {
@@ -232,13 +248,13 @@
             background: var(--bg-grad);
             padding: 40px;
             text-align: center;
+            border: 10px solid var(--p);
             border-radius: 30px;
             color: white;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            border: 10px solid var(--p);
         }
     </style>
 </head>
@@ -329,7 +345,7 @@
     <audio id="bg-audio" loop src="/static/audio/bansuri_bg.mp3"></audio>
 
     <script>
-        // 1. User ID Logic
+        // 1. User ID Logic - Har phone mate unique ID
         let userId = localStorage.getItem('jap_user_id');
         if (!userId) {
             userId = 'u_' + Math.random().toString(36).substr(2, 9) + Date.now();
@@ -396,6 +412,7 @@
             const a = document.getElementById('mantra-audio');
             a.currentTime = 0; a.play().catch(() => { });
             if (curr % goal === 0) confetti();
+            if (navigator.vibrate) navigator.vibrate(curr % goal === 0 ? 300 : 50);
             save();
         }
 
