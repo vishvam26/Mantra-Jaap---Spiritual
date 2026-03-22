@@ -8,8 +8,8 @@ app = Flask(__name__)
 IST = pytz.timezone('Asia/Kolkata')
 
 # --- Supabase Setup (અહીં તમારી સાચી વિગતો નાખો) ---
-SUPABASE_URL = "https://qpjqkeujoylexlsegpef.supabase.co"
-SUPABASE_KEY = "sb_publishable_wCoGC4x07Qg6joI6oyJ4kQ_lxQJWz43"
+SUPABASE_URL = "https://jxyrbfwibjlkkdjrsrqg.supabase.co"
+SUPABASE_KEY = "sb_publishable_UQOjjJApS0CYWhBKtrm_rA_ekDreIji"
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 
