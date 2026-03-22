@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mantra-jaap-v1';
+const CACHE_NAME = 'mantra-jaap-v2'; // વર્ઝન બદલ્યું છે
 const urlsToCache = [
   '/',
   '/auto-jap.html',
@@ -11,38 +11,28 @@ const urlsToCache = [
   '/static/audio/krishna.mp3'
 ];
 
-// Install Service Worker
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => {
-      console.log('Opened cache');
-      return cache.addAll(urlsToCache);
-    })
+    caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache))
   );
 });
 
-// Fetch Assets from Cache
 self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(event.request).then(response => {
-      // Jo request cache ma hoy to tya thi apo, nahi to network par jao
-      return response || fetch(event.request);
+      // જો કેશમાં હોય તો ત્યાંથી આપો, નહિતર નેટવર્ક પરથી લો
+      return response || fetch(event.request).catch(() => {
+          // જો નેટવર્ક પણ ના હોય તો કઈ ના કરો
+      });
     })
   );
 });
 
-// Activate & Cleanup Old Caches
+// જૂની કેશ ક્લિયર કરવા માટે
 self.addEventListener('activate', event => {
-  const cacheWhitelist = [CACHE_NAME];
   event.waitUntil(
-    caches.keys().then(cacheNames => {
-      return Promise.all(
-        cacheNames.map(cacheName => {
-          if (cacheWhitelist.indexOf(cacheName) === -1) {
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    })
+    caches.keys().then(keys => Promise.all(
+      keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
+    ))
   );
 });
