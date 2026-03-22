@@ -1,27 +1,14 @@
 import os
-import sqlite3
 from datetime import datetime, timedelta
-from flask import Flask, render_template, jsonify, request, redirect, url_for
+from flask import Flask, render_template, jsonify, request
+from supabase import create_client, Client
 
 app = Flask(__name__)
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.path.join(BASE_DIR, 'database.db')
-
-def init_db():
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
-    # Tables banavva mate
-    cursor.execute('''CREATE TABLE IF NOT EXISTS jap_counter 
-                      (id INTEGER PRIMARY KEY, current_count INTEGER, total_count INTEGER, last_date TEXT)''')
-    cursor.execute('CREATE TABLE IF NOT EXISTS jap_history (date TEXT PRIMARY KEY, count INTEGER)')
-    
-    cursor.execute('SELECT id FROM jap_counter WHERE id = 1')
-    if cursor.fetchone() is None:
-        cursor.execute('INSERT INTO jap_counter (id, current_count, total_count, last_date) VALUES (1, 0, 0, ?)', 
-                       (datetime.now().strftime('%Y-%m-%d'),))
-    conn.commit()
-    conn.close()
+# --- Supabase Setup ---
+SUPABASE_URL = "https://bpnamocnrxrfsznvoqvw.supabase.co"
+SUPABASE_KEY = "sb_publishable_6poF0267VRL_Y9WkLAd04g_NRKG63En"
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 @app.route('/')
 def index():
@@ -33,44 +20,40 @@ def auto_jap():
 
 @app.route('/get_count', methods=['GET'])
 def get_count():
-    today_dt = datetime.now()
-    today = today_dt.strftime('%Y-%m-%d')
-    yesterday = (today_dt - timedelta(days=1)).strftime('%Y-%m-%d') # 2. Yesterday calculate karo
-    
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
-    
-    # 3. Streak column check karo, na hoy to umero (Migration)
-    try:
-        cursor.execute('ALTER TABLE jap_counter ADD COLUMN streak INTEGER DEFAULT 0')
-        conn.commit()
-    except: pass
+    today = datetime.now().strftime('%Y-%m-%d')
+    yesterday = (datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d')
 
-    cursor.execute('SELECT current_count, total_count, last_date, streak FROM jap_counter WHERE id = 1')
-    row = cursor.fetchone()
-    
-    curr_val, total_val, last_date, streak = row if row else (0, 0, "", 0)
+    # 1. Main counter data મેળવો
+    res = supabase.table("jap_counter").select("*").eq("id", 1).execute()
+    row = res.data[0] if res.data else {"current_count": 0, "total_count": 0, "last_date": today, "streak": 0}
 
-    # 4. Streak Logic
+    curr_val = row['current_count']
+    total_val = row['total_count']
+    last_date = row['last_date']
+    streak = row['streak']
+
+    # 2. Streak Logic
     if last_date != today:
-        if last_date == yesterday:
-            if curr_val > 0: streak += 1
+        if last_date == yesterday and curr_val > 0:
+            streak += 1
         else:
-            # Jo user aaje jaap sharu kare to streak 1 thavi joie
             streak = 1 if curr_val > 0 else 0
-            
-        curr_val = 0
-        cursor.execute('UPDATE jap_counter SET current_count = 0, last_date = ?, streak = ? WHERE id = 1', (today, streak))
-        conn.commit()
-    
-    cursor.execute('SELECT date, count FROM jap_history')
-    history = dict(cursor.fetchall())
-    conn.close()
+        
+        curr_val = 0 # નવો દિવસ એટલે આજનો કાઉન્ટ 0
+        supabase.table("jap_counter").update({
+            "current_count": 0, 
+            "last_date": today, 
+            "streak": streak
+        }).eq("id", 1).execute()
+
+    # 3. History મેળવો
+    hist_res = supabase.table("jap_history").select("*").execute()
+    history = {item['date']: item['count'] for item in hist_res.data}
 
     return jsonify({
         'current_count': curr_val,
         'total_count': total_val,
-        'streak': streak, # 5. Streak return karo
+        'streak': streak,
         'today': today,
         'history': history
     })
@@ -81,47 +64,27 @@ def update_count():
     curr = data.get('current_count', 0)
     total = data.get('total_count', 0)
     today = datetime.now().strftime('%Y-%m-%d')
-    
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
+
     try:
-        # 1. Pehla check karo ke hal ni streak ketli chhe
-        cursor.execute('SELECT last_date, streak FROM jap_counter WHERE id = 1')
-        row = cursor.fetchone()
-        last_date, streak = row if row else (None, 0)
-        
-        # 2. Logic: Jo aaje pehli var jaap thaya (curr > 0) ane streak 0 chhe, to tene 1 karo
-        if curr > 0 and last_date != today:
-            if last_date == yesterday:
-               streak += 1
-            else:
-               streak = 1
-            
-        # 3. Database ma badhu update karo (streak sathe)
-        cursor.execute('''UPDATE jap_counter 
-                          SET current_count = ?, total_count = ?, last_date = ?, streak = ? 
-                          WHERE id = 1''', (curr, total, today, streak))
-        
-        # 4. History table update karo
-        cursor.execute('''INSERT INTO jap_history (date, count) VALUES (?, ?) 
-                          ON CONFLICT(date) DO UPDATE SET count = ?''', (today, curr, curr))
-        
-        conn.commit()
+        # 1. Streak update logic
+        res = supabase.table("jap_counter").select("streak").eq("id", 1).execute()
+        streak = res.data[0]['streak'] if res.data else 0
+        if curr > 0 and streak == 0: streak = 1
+
+        # 2. Update Main Table
+        supabase.table("jap_counter").update({
+            "current_count": curr,
+            "total_count": total,
+            "last_date": today,
+            "streak": streak
+        }).eq("id", 1).execute()
+
+        # 3. Update History Table (Upsert)
+        supabase.table("jap_history").upsert({"date": today, "count": curr}).execute()
+
         return jsonify({'status': 'success', 'streak': streak})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-    finally:
-        conn.close()
-
-# PWA Support
-@app.route('/manifest.json')
-def serve_manifest():
-    return app.send_static_file('manifest.json')
-
-@app.route('/sw.js')
-def serve_sw():
-    return app.send_static_file('sw.js')
 
 if __name__ == '__main__':
-    init_db()  # <--- Aa call hovvo khub jaruri chhe!
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True)
