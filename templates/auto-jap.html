@@ -213,106 +213,19 @@
 
     <audio id="auto-audio" loop src="/static/audio/auto.mp3"></audio>
 
+    // ... (Upar no CSS same rahese) ...
+
     <script>
         let audioPlayer = document.getElementById('auto-audio');
-        let count = 0;           // Aa session na current counts
-        let dbTotalCount = 0;    // Database mathi aavela total counts
+        let count = 0;
+        let dbTotalCount = 0;
         let isPlaying = false;
         let counterInterval;
 
-        // 1. Page load thay tyare Database mathi latest counts lai aavo
         document.addEventListener('DOMContentLoaded', async () => {
-            // LocalStorage mathi turant data batavo (Optional for UI speed)
-            count = parseInt(localStorage.getItem('jap_curr')) || 0;
-            document.getElementById('count-display').innerText = count;
-            document.getElementById('mala-count').innerText = Math.floor(count / 108);
-            updateProgress();
-
             await loadDataFromDB();
         });
 
-        async function loadDataFromDB() {
-            try {
-                const response = await fetch('/get_count');
-                const d = await response.json();
-
-                if (d.current_count !== undefined) {
-                    count = parseInt(d.current_count);
-                    dbTotalCount = parseInt(d.total_count); // Database no total count store karo
-
-                    document.getElementById('count-display').innerText = count;
-                    document.getElementById('mala-count').innerText = Math.floor(count / 108);
-                    updateProgress();
-                }
-            } catch (err) {
-                console.error("Data load karva ma bhul chhe:", err);
-            }
-        }
-
-        // 2. Jaap Sharu karvanu function (Local Audio sathe)
-        function startJap() {
-            if (isPlaying) return;
-
-            // Audio play karo
-            if (audioPlayer) {
-                audioPlayer.play().catch(err => console.error("Audio play error:", err));
-            }
-
-            isPlaying = true;
-            document.getElementById('main-card').classList.add('card-active-effect');
-            document.getElementById('start-btn').innerText = "Pause Session";
-
-            counterInterval = setInterval(() => {
-                count++;
-                // Navo total = Database no total + current session ma jetla vadhiya te
-                // Note: Ahi logic badlavo padshe jethi count double na thay
-                // Pan saraltat mate, dar vakhte live update kariye:
-
-                document.getElementById('count-display').innerText = count;
-                localStorage.setItem('jap_curr', count);
-
-                // Dar 1 count par database update karvu hoy to (Optional):
-                // saveToDB(count, dbTotalCount + 1); 
-
-                if (count % 108 === 0) {
-                    document.getElementById('mala-count').innerText = Math.floor(count / 108);
-                    confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-                }
-
-                updateProgress();
-                spawnSnowflake();
-            }, 850); // Tamari audio file ni speed mujab aane adjust kari shako (e.g. 1000ms)
-        }
-
-
-
-        function stopJap() {
-            isPlaying = false;
-            if (audioPlayer) audioPlayer.pause();
-            document.getElementById('main-card').classList.remove('card-active-effect');
-            clearInterval(counterInterval);
-            document.getElementById('start-btn').innerText = "Resume Jaap";
-
-            // Stop thay tyare final save
-            saveToDB();
-        }
-
-        // auto-jap.html ma saveToDB function replace karo
-        function saveToDB() {
-            // Navo total = Database mathi aavelo juno total + tame aaje karela total jap
-            // Aa logic thi total count hamesha sahi rahese
-            fetch('/update_count', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    current_count: count,
-                    total_count: dbTotalCount + (count - (parseInt(localStorage.getItem('jap_curr_at_start')) || 0))
-                })
-            }).then(res => res.json())
-                .then(data => console.log("Database Sync Done"));
-        }
-
-        // loadDataFromDB ma aa line umero
         async function loadDataFromDB() {
             try {
                 const response = await fetch('/get_count');
@@ -321,50 +234,68 @@
                     count = parseInt(d.current_count);
                     dbTotalCount = parseInt(d.total_count);
 
-                    // Session sharu thaya pehla no count save karo jethi calculation sahi thay
+                    // Session sharu thaya pehla no base count save karo
                     localStorage.setItem('jap_curr_at_start', count);
 
                     document.getElementById('count-display').innerText = count;
                     document.getElementById('mala-count').innerText = Math.floor(count / 108);
                     updateProgress();
                 }
-            } catch (err) { console.log(err); }
-        }
-        function toggleJap() {
-            if (isPlaying) stopJap(); else startJap();
+            } catch (err) { console.log("DB Load Error", err); }
         }
 
-        // 4. Exit karva mate
-        function exitSession() {
-            stopJap();
-            setTimeout(() => {
-                window.location.href = '/';
-            }, 500);
+        function startJap() {
+            if (isPlaying) return;
+            if (audioPlayer) audioPlayer.play().catch(e => console.log(e));
+            isPlaying = true;
+            document.getElementById('main-card').classList.add('card-active-effect');
+            document.getElementById('start-btn').innerText = "Pause Session";
+
+            counterInterval = setInterval(() => {
+                count++;
+                document.getElementById('count-display').innerText = count;
+
+                if (count % 108 === 0) {
+                    document.getElementById('mala-count').innerText = Math.floor(count / 108);
+                    confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                }
+                updateProgress();
+                spawnSnowflake();
+
+                // Dar 10 count e automatic database update karo
+                if (count % 10 === 0) saveToDB();
+            }, 850);
         }
 
-        // UI Progress Functions
-        function updateProgress() {
-            const circle = document.getElementById('progress-circle');
-            const bar = document.getElementById('goal-bar');
-            const p = (count % 108) / 108;
-            const offset = 565.48 - (p * 565.48);
-            if (circle) circle.style.strokeDashoffset = offset;
-            if (bar) bar.style.width = (p * 100) + "%";
+        function stopJap() {
+            isPlaying = false;
+            if (audioPlayer) audioPlayer.pause();
+            document.getElementById('main-card').classList.remove('card-active-effect');
+            clearInterval(counterInterval);
+            document.getElementById('start-btn').innerText = "Resume Jaap";
+            saveToDB();
         }
 
-        function spawnSnowflake() {
-            const s = document.createElement('div');
-            s.className = 'snowflake';
-            s.style.left = Math.random() * 100 + "vw";
-            s.style.top = "-10px";
-            let size = Math.random() * 5 + 2;
-            s.style.width = size + "px"; s.style.height = size + "px";
-            document.body.appendChild(s);
-            s.animate([{ transform: 'translateY(0)', opacity: 0.6 }, { transform: 'translateY(110vh)', opacity: 0 }], { duration: 4000 });
-            setTimeout(() => s.remove(), 4000);
+        function saveToDB() {
+            const startSessionCount = parseInt(localStorage.getItem('jap_curr_at_start')) || 0;
+            const sessionGain = count - startSessionCount;
+
+            fetch('/update_count', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    current_count: count,
+                    // Navo total = Database total + aaje vadhya te
+                    total_count: dbTotalCount + (sessionGain > 0 ? sessionGain : 0)
+                })
+            }).then(res => res.json())
+                .then(data => console.log("Database Sync Done"));
         }
 
-        function toggleTheme() { document.body.classList.toggle('light-mode'); }
+        function toggleJap() { if (isPlaying) stopJap(); else startJap(); }
+        function exitSession() { stopJap(); setTimeout(() => { window.location.href = '/'; }, 500); }
+
+        // updateProgress ane spawnSnowflake functions same raheshe...
     </script>
 </body>
 
