@@ -295,15 +295,16 @@
             const sessionIncrease = count - startCount;
             const finalTotal = dbTotalCount + sessionIncrease;
 
-            fetch(${window.location.origin}/update_count, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    user_id: userId,
-                    current_count: count,
-                    total_count: finalTotal
-                })
-            });
+           // લાઈન ૧૬૭ માં આ રીતે લખો:
+fetch(`${window.location.origin}/update_count`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+        user_id: userId,
+        current_count: count,
+        total_count: finalTotal
+    })
+});
         }
 
         function exitSession() {
