@@ -434,15 +434,14 @@
             if (total >= 5000) document.getElementById('b3').classList.add('active');
         }
 
-        function save() {
-    // ખાતરી કરો કે userId અહીં ઉપલબ્ધ છે
-    const userId = localStorage.getItem('jap_user_id');
+       function save() {
+    const userId = localStorage.getItem('jap_user_id'); // userId મેળવો
     
     fetch('/update_count', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-            user_id: userId,        // આ લાઈન ઉમેરવી ખુબ જરૂરી છે
+            user_id: userId,        // આ લાઈન હોવી જ જોઈએ
             current_count: curr, 
             total_count: total 
         })
