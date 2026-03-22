@@ -3,77 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Radha Radha | Auto jaap</title>
-    <link rel="icon" type="image/png" href="/static/logo.png">
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <title>Auto Jaap</title>
     <style>
-        :root { --bg-grad: linear-gradient(135deg, #00101a 0%, #012a4a 50%, #01497c 100%); --text-color: #e1f5fe; --p: #00b4d8; --glass: rgba(255, 255, 255, 0.12); }
-        body { margin: 0; height: 100vh; background: var(--bg-grad); color: var(--text-color); font-family: 'Segoe UI', sans-serif; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-        .card { background: var(--glass); backdrop-filter: blur(25px); padding: 40px; border-radius: 40px; text-align: center; width: 300px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
-        #count-display { font-size: 5rem; font-weight: bold; margin: 20px 0; color: white; }
-        .btn { padding: 15px; border-radius: 50px; border: none; background: var(--p); color: white; font-weight: bold; width: 100%; cursor: pointer; font-size: 1.1rem; }
+        body { background: #00101a; color: white; font-family: sans-serif; text-align: center; padding-top: 50px; }
+        #count { font-size: 6rem; font-weight: bold; margin: 30px 0; }
+        .btn { padding: 15px 40px; border-radius: 50px; border: none; background: #00b4d8; color: white; cursor: pointer; }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h2 style="letter-spacing: 2px;">Radha Radha</h2>
-        <div id="count-display">0</div>
-        <button class="btn" id="start-btn" onclick="toggleJap()">Start Jaap</button>
-        <br><br>
-        <a href="/" onclick="saveAndExit(event)" style="color:var(--p); text-decoration:none; font-weight:bold;">SAVE & EXIT</a>
-    </div>
-
-    <audio id="auto-audio" loop src="/static/audio/auto.mp3"></audio>
+    <h2>Auto-Jap Mode</h2>
+    <div id="count">0</div>
+    <button class="btn" id="start-btn" onclick="toggleJap()">Start Jaap</button>
+    <br><br>
+    <a href="/" onclick="saveToDB()" style="color:#00b4d8; font-weight: bold; text-decoration: none;">SAVE & EXIT</a>
 
     <script>
         const userId = localStorage.getItem('jap_user_id');
-        let count = 0, dbTotalCount = 0, isPlaying = false, interval;
-        const getBaseUrl = () => window.location.origin;
+        let count = 0, dbTotal = 0, playing = false, inv;
 
         window.onload = async () => {
-            if(!userId) window.location.href = '/';
-            const r = await fetch(`${getBaseUrl()}/get_count?user_id=${userId}`);
+            const r = await fetch(`/get_count?user_id=${userId}`);
             const d = await r.json();
-            count = d.current_count;
-            dbTotalCount = d.total_count;
-            document.getElementById('count-display').innerText = count;
-            localStorage.setItem('jap_curr_at_start', count);
+            count = d.current_count; dbTotal = d.total_count;
+            document.getElementById('count').innerText = count;
+            localStorage.setItem('start_c', count);
         };
 
         function toggleJap() {
-            const btn = document.getElementById('start-btn');
-            const audio = document.getElementById('auto-audio');
-            if (isPlaying) {
-                clearInterval(interval);
-                audio.pause();
-                btn.innerText = "Resume Jaap";
+            if (playing) {
+                clearInterval(inv);
                 saveToDB();
             } else {
-                audio.play().catch(e => console.log("Audio play failed"));
-                interval = setInterval(() => {
-                    count++;
-                    document.getElementById('count-display').innerText = count;
-                    if (count % 108 === 0) confetti();
+                inv = setInterval(() => {
+                    count++; document.getElementById('count').innerText = count;
                 }, 900);
-                btn.innerText = "Pause Jaap";
             }
-            isPlaying = !isPlaying;
+            playing = !playing;
         }
 
         function saveToDB() {
-            const diff = count - (parseInt(localStorage.getItem('jap_curr_at_start')) || 0);
-            fetch(`${getBaseUrl()}/update_count`, {
+            const diff = count - (parseInt(localStorage.getItem('start_c')) || 0);
+            fetch('/update_count', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ user_id: userId, current_count: count, total_count: dbTotalCount + diff })
+                body: JSON.stringify({ user_id: userId, current_count: count, total_count: dbTotal + diff })
             });
-        }
-
-        function saveAndExit(e) {
-            e.preventDefault();
-            if (isPlaying) toggleJap();
-            saveToDB();
-            setTimeout(() => window.location.href = '/', 500);
         }
     </script>
 </body>
