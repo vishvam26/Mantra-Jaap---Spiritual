@@ -29,13 +29,13 @@
             --s: #90e0ef;
         }
 
-/* Aa line replace karo */
-.light-mode {
-    --glass: rgba(0, 0, 0, 0.05);
-    --text-color: #2c3e50;
-    --glow-color: rgba(0, 0, 0, 0.1);
-    /* --bg-grad ahi fix nathi, jethi setT() tene badli shake */
-}
+        /* Aa line replace karo */
+        .light-mode {
+            --glass: rgba(0, 0, 0, 0.05);
+            --text-color: #2c3e50;
+            --glow-color: rgba(0, 0, 0, 0.1);
+            /* --bg-grad ahi fix nathi, jethi setT() tene badli shake */
+        }
 
         body {
             margin: 0;
@@ -383,102 +383,85 @@
         // index.html na script ma replace karo
         // index.html na script ma window.onload replace karo
         window.onload = () => {
-    // 1. Database mathi fresh data fetch karo
-    fetch('/get_count')
-        .then(r => r.json())
-        .then(d => {
-            curr = d.current_count;
-            total = d.total_count;
-            let sCount = d.streak || 0; // Database mathi streak aavshe
+            // Database mathi fresh data fetch karo
+            fetch('/get_count')
+                .then(r => r.json())
+                .then(d => {
+                    curr = d.current_count;
+                    total = d.total_count;
+                    let sCount = d.streak || 0;
 
-            // 2. UI Update (No checkS call needed)
-            document.getElementById('count-num').innerText = curr;
-            document.getElementById('total-c').innerText = total;
-            document.getElementById('streak').innerText = sCount; 
+                    document.getElementById('count-num').innerText = curr;
+                    document.getElementById('total-c').innerText = total;
+                    document.getElementById('streak').innerText = sCount;
 
-            // 3. LocalStorage update (fakt offline backup mate)
-            localStorage.setItem('jap_total', total);
-            localStorage.setItem('jap_curr', curr);
-            localStorage.setItem('strk', sCount); 
+                    localStorage.setItem('jap_total', total);
+                    localStorage.setItem('jap_curr', curr);
+                    localStorage.setItem('strk', sCount);
 
-            updateReport(d.history, d.today);
-        })
-        .catch(err => {
-            console.error("DB Error:", err);
-            // Jo offline hoy to local storage vaparo
-            curr = parseInt(localStorage.getItem('jap_curr')) || 0;
-            total = parseInt(localStorage.getItem('jap_total')) || 0;
-            let sCount = parseInt(localStorage.getItem('strk')) || 0;
-            
-            document.getElementById('count-num').innerText = curr;
-            document.getElementById('total-c').innerText = total;
-            document.getElementById('streak').innerText = sCount;
-        });
+                    updateReport(d.history, d.today);
+                })
+                .catch(err => {
+                    console.error("Offline Mode");
+                    curr = parseInt(localStorage.getItem('jap_curr')) || 0;
+                    total = parseInt(localStorage.getItem('jap_total')) || 0;
+                    document.getElementById('count-num').innerText = curr;
+                    document.getElementById('total-c').innerText = total;
+                    document.getElementById('streak').innerText = localStorage.getItem('strk') || 0;
+                });
 
-    document.getElementById('notif-time').value = localStorage.getItem('pTime') || "";
-    
-    // Theme setup
-    const isDark = localStorage.getItem('darkMode') === 'true';
-    if (!isDark) {
-        document.body.classList.add('light-mode');
-        document.getElementById('mode-icon').innerText = "☀️";
-    }
-    
-    changeMantra();
-    setT(currentTheme);
-};
+            changeMantra();
+            setT(currentTheme);
+        };
 
-// ... toggleMode function same raheshe ...
-function toggleMode() {
-    const isLight = document.body.classList.toggle('light-mode');
-    localStorage.setItem('darkMode', !isLight);
-    document.getElementById('mode-icon').innerText = isLight ? "☀️" : "🌙";
-    setT(currentTheme);
-}
-function setT(t) {
-    currentTheme = t;
-    // Buttons active class update
-    document.querySelectorAll('.t-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById('btn-' + t).classList.add('active');
-
-    const isLight = document.body.classList.contains('light-mode');
-    const root = document.documentElement;
-
-    if (t === 'kailash') {
-        if (isLight) {
-            root.style.setProperty('--p', '#0077b6');
-            root.style.setProperty('--bg-grad', 'linear-gradient(135deg, #e0f2f1 0%, #b2ebf2 100%)', 'important');
-        } else {
-            root.style.setProperty('--p', '#00b4d8');
-            root.style.setProperty('--bg-grad', 'linear-gradient(135deg, #00101a 0%, #012a4a 50%, #01497c 100%)', 'important');
+        // ... toggleMode function same raheshe ...
+        function toggleMode() {
+            const isLight = document.body.classList.toggle('light-mode');
+            localStorage.setItem('darkMode', !isLight);
+            document.getElementById('mode-icon').innerText = isLight ? "☀️" : "🌙";
+            setT(currentTheme);
         }
-    } else if (t === 'vrindavan') {
-        if (isLight) {
-            root.style.setProperty('--p', '#2e7d32');
-            root.style.setProperty('--bg-grad', 'linear-gradient(135deg, #f1f8e9 0%, #dcedc8 100%)', 'important');
-        } else {
-            root.style.setProperty('--p', '#4caf50');
-            root.style.setProperty('--bg-grad', 'linear-gradient(135deg, #0a1a0a 0%, #1b3022 50%, #2d5a27 100%)', 'important');
+        function setT(t) {
+            currentTheme = t;
+            // Buttons active class update
+            document.querySelectorAll('.t-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('btn-' + t).classList.add('active');
+
+            const isLight = document.body.classList.contains('light-mode');
+            const root = document.documentElement;
+
+            if (t === 'kailash') {
+                if (isLight) {
+                    root.style.setProperty('--p', '#0077b6');
+                    root.style.setProperty('--bg-grad', 'linear-gradient(135deg, #e0f2f1 0%, #b2ebf2 100%)', 'important');
+                } else {
+                    root.style.setProperty('--p', '#00b4d8');
+                    root.style.setProperty('--bg-grad', 'linear-gradient(135deg, #00101a 0%, #012a4a 50%, #01497c 100%)', 'important');
+                }
+            } else if (t === 'vrindavan') {
+                if (isLight) {
+                    root.style.setProperty('--p', '#2e7d32');
+                    root.style.setProperty('--bg-grad', 'linear-gradient(135deg, #f1f8e9 0%, #dcedc8 100%)', 'important');
+                } else {
+                    root.style.setProperty('--p', '#4caf50');
+                    root.style.setProperty('--bg-grad', 'linear-gradient(135deg, #0a1a0a 0%, #1b3022 50%, #2d5a27 100%)', 'important');
+                }
+            } else if (t === 'ayodha') {
+                if (isLight) {
+                    root.style.setProperty('--p', '#ef6c00');
+                    root.style.setProperty('--bg-grad', 'linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%)', 'important');
+                } else {
+                    root.style.setProperty('--p', '#ff9800');
+                    root.style.setProperty('--bg-grad', 'linear-gradient(135deg, #1a0f00 0%, #3e2723 50%, #5d4037 100%)', 'important');
+                }
+            }
         }
-    } else if (t === 'ayodha') {
-        if (isLight) {
-            root.style.setProperty('--p', '#ef6c00');
-            root.style.setProperty('--bg-grad', 'linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%)', 'important');
-        } else {
-            root.style.setProperty('--p', '#ff9800');
-            root.style.setProperty('--bg-grad', 'linear-gradient(135deg, #1a0f00 0%, #3e2723 50%, #5d4037 100%)', 'important');
-        }
-    }
-}
 
         function handleJap() {
             curr++; total++; updateUI();
             const a = document.getElementById('mantra-audio');
             a.currentTime = 0; a.play().catch(() => { });
-            const c = document.getElementById('circle');
-            c.style.transform = "scale(1.1)"; setTimeout(() => c.style.transform = "scale(1)", 100);
             if (curr % goal === 0) confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-            if (navigator.vibrate) navigator.vibrate(curr % goal === 0 ? 300 : 50);
             save();
         }
 
@@ -504,8 +487,13 @@ function setT(t) {
         }
 
         function save() {
-            fetch('/update_count', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ current_count: curr, total_count: total }) });
-            localStorage.setItem('jap_total', total); localStorage.setItem('jap_curr', curr);
+            fetch('/update_count', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ current_count: curr, total_count: total })
+            });
+            localStorage.setItem('jap_total', total);
+            localStorage.setItem('jap_curr', curr);
         }
 
         function startH() {
