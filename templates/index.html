@@ -435,12 +435,26 @@
         }
 
         function save() {
-            fetch(`${window.location.origin}/update_count`, {
-                 method: 'POST',
-                 headers: { 'Content-Type': 'application/json' },
-                 body: JSON.stringify({ user_id: userId, current_count: curr, total_count: total })
-             });
-        }
+    // ખાતરી કરો કે userId અહીં ઉપલબ્ધ છે
+    const userId = localStorage.getItem('jap_user_id');
+    
+    fetch('/update_count', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+            user_id: userId,        // આ લાઈન ઉમેરવી ખુબ જરૂરી છે
+            current_count: curr, 
+            total_count: total 
+        })
+    })
+    .then(response => {
+        if (!response.ok) console.error("Update failed with status:", response.status);
+    })
+    .catch(err => console.error("Fetch error:", err));
+
+    localStorage.setItem('jap_total', total); 
+    localStorage.setItem('jap_curr', curr);
+}
 
         function startH() {
             document.getElementById('reset-btn').style.transform = "scale(0.9)";
