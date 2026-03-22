@@ -142,7 +142,9 @@
             transition: 0.3s;
         }
 
-        .main-btn:active { transform: scale(0.98); }
+        .main-btn:active {
+            transform: scale(0.98);
+        }
 
         .theme-toggle {
             background: none;
@@ -196,7 +198,8 @@
         </div>
 
         <a href="javascript:void(0)" onclick="exitSession()"
-            style="color: var(--accent); text-decoration: none; font-size: 12px; display: block; margin-top: 25px; opacity: 0.6; font-weight: bold;">SAVE & EXIT</a>
+            style="color: var(--accent); text-decoration: none; font-size: 12px; display: block; margin-top: 25px; opacity: 0.6; font-weight: bold;">SAVE
+            & EXIT</a>
     </div>
 
     <!-- Background Music -->
@@ -205,8 +208,8 @@
     <script>
         // 1. User ID ane Counters set karo
         const userId = localStorage.getItem('jap_user_id');
-        let count = 0;           
-        let dbTotalCount = 0;    
+        let count = 0;
+        let dbTotalCount = 0;
         let isPlaying = false;
         let counterInterval;
         const audioPlayer = document.getElementById('auto-audio');
@@ -215,14 +218,14 @@
 
         // Page load thaye tyare initialization
         document.addEventListener('DOMContentLoaded', async () => {
-            if(!userId) {
+            if (!userId) {
                 alert("Pehle main page par jaaiye jethi userId bani shake.");
                 window.location.href = '/';
                 return;
             }
-            
+
             // Theme setup
-            if(localStorage.getItem('darkMode') === 'false') {
+            if (localStorage.getItem('darkMode') === 'false') {
                 document.body.classList.add('light-mode');
             }
 
@@ -257,17 +260,17 @@
         function startJap() {
             if (isPlaying) return;
             isPlaying = true;
-            
+
             // Audio chalu karo
             audioPlayer.play().catch(e => console.log("Audio play failed, user interaction jaroori chhe."));
-            
+
             document.getElementById('main-card').classList.add('card-active-effect');
             document.getElementById('start-btn').innerText = "Pause Session";
 
             counterInterval = setInterval(() => {
                 count++;
                 document.getElementById('count-display').innerText = count;
-                
+
                 if (count % 108 === 0) {
                     document.getElementById('mala-count').innerText = Math.floor(count / 108);
                     confetti({ particleCount: 100, spread: 60, origin: { y: 0.7 } });
@@ -281,7 +284,7 @@
         function stopJap() {
             if (!isPlaying) return;
             isPlaying = false;
-            
+
             audioPlayer.pause();
             document.getElementById('main-card').classList.remove('card-active-effect');
             clearInterval(counterInterval);
@@ -295,18 +298,19 @@
             const sessionIncrease = count - startCount;
             const finalTotal = dbTotalCount + sessionIncrease;
 
-           // લાઈન ૧૬૭ માં આ રીતે લખો:
-fetch(`${window.location.origin}/update_count`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-        user_id: userId,
-        current_count: count,
-        total_count: finalTotal
-    })
-});
+            // Aa niche mujab na sudhara sathe fetch lakho
+            fetch(`${window.location.origin}/update_count`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    user_id: userId,
+                    current_count: count,
+                    total_count: finalTotal
+                })
+            })
+                .then(r => { if (!r.ok) console.log("Update failed"); })
+                .catch(e => console.log("Fetch error:", e));
         }
-
         function exitSession() {
             if (isPlaying) stopJap(); else saveToDB();
             setTimeout(() => {
@@ -318,11 +322,11 @@ fetch(`${window.location.origin}/update_count`, {
             const circle = document.getElementById('progress-circle');
             const bar = document.getElementById('goal-bar');
             const p = (count % 108) / 108;
-            
+
             // Progress circle logic
             const offset = 565.48 - (p * 565.48);
             if (circle) circle.style.strokeDashoffset = offset;
-            
+
             // Linear progress bar
             if (bar) bar.style.width = (p * 100) + "%";
         }
