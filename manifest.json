@@ -1,7 +1,6 @@
 {
   "name": "Mantra Jaap Spiritual",
   "short_name": "MantraJaap",
-  "description": "Daily Mantra Jaap and Spiritual Tracker",
   "start_url": "/",
   "display": "standalone",
   "orientation": "portrait",
