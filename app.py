@@ -1,16 +1,26 @@
 import os
+from dotenv import load_dotenv # આ નવી લાઇન ઉમેરો
 from datetime import datetime, timedelta
 import pytz
 from flask import Flask, render_template, jsonify, request, send_from_directory, make_response
 from supabase import create_client, Client
 
+# .env ફાઇલમાંથી વેલ્યુ લોડ કરવા માટે
+load_dotenv()
+
 app = Flask(__name__)
 IST = pytz.timezone('Asia/Kolkata')
 
-# --- Supabase Setup ---
-SUPABASE_URL = "https://hawaajmvzrhivqrjpsxo.supabase.co"
-SUPABASE_KEY = "sb_publishable__lCMKk14l6cydqWv0TjY9w_O7jXc6eU"
+# --- Supabase Setup (હવે સુરક્ષિત રીતે) ---
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+
+if not SUPABASE_URL or not SUPABASE_KEY:
+    raise ValueError("Supabase credentials missing! Check your .env file.")
+
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+
+# બાકીનો કોડ અહીં નીચે આવશે...
 
 @app.route('/')
 def index():
