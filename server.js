@@ -51,7 +51,94 @@ app.get('/auto-jap.html', (req, res) => {
     res.sendFile(path.join(__dirname, 'templates', 'auto-jap.html'));
 });
 
+app.get('/aarti.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'templates', 'aarti.html'));
+});
+
 // --- API Routes ---
+
+// API to search Aarti videos from YouTube without API Key
+app.get('/api/search_aarti', async (req, res) => {
+    const query = req.query.q;
+    if (!query) {
+        return res.status(400).json({ error: 'Search query missing' });
+    }
+    
+    // Append "aarti" to query if not present to ensure relevant devotional results
+    const searchQuery = query.toLowerCase().includes('aarti') || 
+                        query.toLowerCase().includes('chalisa') || 
+                        query.toLowerCase().includes('bhajan') ||
+                        query.toLowerCase().includes('mantra')
+        ? query 
+        : `${query} aarti`;
+        
+    const url = `https://www.youtube.com/results?search_query=${encodeURIComponent(searchQuery)}`;
+    
+    try {
+        const response = await fetch(url, {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36',
+                'Accept-Language': 'en-US,en;q=0.9'
+            }
+        });
+        const html = await response.text();
+        
+        const regex = /var ytInitialData = ({.*?});/;
+        const match = html.match(regex);
+        
+        if (!match) {
+            return res.json([]);
+        }
+        
+        const data = JSON.parse(match[1]);
+        const videos = [];
+        
+        function findVideoRenderers(obj) {
+            if (!obj || typeof obj !== 'object') return;
+            
+            if (obj.videoRenderer) {
+                const video = obj.videoRenderer;
+                const videoId = video.videoId;
+                
+                let title = 'Unknown';
+                if (video.title && video.title.runs && video.title.runs[0]) {
+                    title = video.title.runs[0].text;
+                } else if (video.title && video.title.simpleText) {
+                    title = video.title.simpleText;
+                }
+                
+                let thumbnailUrl = '';
+                if (video.thumbnail && video.thumbnail.thumbnails && video.thumbnail.thumbnails[0]) {
+                    thumbnailUrl = video.thumbnail.thumbnails[0].url;
+                }
+                
+                let duration = 'Unknown';
+                if (video.lengthText && video.lengthText.runs && video.lengthText.runs[0]) {
+                    duration = video.lengthText.runs[0].text;
+                } else if (video.lengthText && video.lengthText.simpleText) {
+                    duration = video.lengthText.simpleText;
+                }
+                
+                if (videoId) {
+                    videos.push({ videoId, title, thumbnailUrl, duration });
+                }
+            } else {
+                for (const key in obj) {
+                    if (Object.prototype.hasOwnProperty.call(obj, key)) {
+                        findVideoRenderers(obj[key]);
+                    }
+                }
+            }
+        }
+        
+        findVideoRenderers(data);
+        return res.json(videos);
+        
+    } catch (err) {
+        console.error("YouTube search error:", err);
+        return res.status(500).json({ error: 'Failed to fetch search results from YouTube' });
+    }
+});
 
 // Get current user count and history
 app.get('/get_count', async (req, res) => {
