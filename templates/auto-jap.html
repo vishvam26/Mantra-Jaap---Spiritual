@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="gu">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radha Radha | Auto jaap</title>
+    <link rel="icon" type="image/png" href="/static/logo.png">
+    <!-- Celebration mate confetti library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            /* Default: Kailash Dark Theme */
+            --bg-grad: linear-gradient(135deg, #00101a 0%, #012a4a 50%, #01497c 100%);
+            --glow-color: rgba(225, 245, 254, 0.4);
+            --text-color: #e1f5fe;
+            --accent: #ffffff;
+            --glass: rgba(255, 255, 255, 0.12);
+            --btn-bg: linear-gradient(to right, #01497c, #012a4a);
+        }
+
+        .light-mode {
+            --bg-grad: linear-gradient(135deg, #fff9e6 0%, #ffecb3 50%, #ffd54f 100%);
+            --glow-color: rgba(255, 215, 0, 0.5);
+            --text-color: #5d4037;
+            --accent: #ff8f00;
+            --glass: rgba(255, 255, 255, 0.4);
+            --btn-bg: linear-gradient(to right, #ffa000, #ff6f00);
+        }
+
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            transition: 0.5s;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-grad);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            color: var(--text-color);
+        }
+
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 40px;
+            padding: 35px;
+            width: 320px;
+            text-align: center;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 10;
+        }
+
+        .card-active-effect {
+            animation: breathe 2.2s infinite alternate ease-in-out;
+        }
+
+        @keyframes breathe {
+            to {
+                transform: scale(1.03);
+                box-shadow: 0 0 55px var(--glow-color);
+            }
+        }
+
+        .mantra-title {
+            font-size: 28px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 5px;
+            text-shadow: 0 0 10px var(--glow-color);
+        }
+
+        .circle-container {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 20px auto;
+        }
+
+        .count-num {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 70px;
+            font-weight: 800;
+        }
+
+        svg {
+            transform: rotate(-90deg);
+        }
+
+        .progress-ring__circle {
+            transition: stroke-dashoffset 0.5s ease;
+            stroke: var(--accent);
+            filter: drop-shadow(0 0 8px var(--accent));
+        }
+
+        .goal-container {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            height: 8px;
+            border-radius: 10px;
+            margin-top: 15px;
+            overflow: hidden;
+        }
+
+        #goal-bar {
+            height: 100%;
+            width: 0%;
+            background: var(--accent);
+            transition: 0.5s;
+            box-shadow: 0 0 10px var(--accent);
+        }
+
+        .controls {
+            margin-top: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .main-btn {
+            padding: 14px 0;
+            border-radius: 50px;
+            border: none;
+            background: var(--btn-bg);
+            color: white;
+            font-weight: bold;
+            font-size: 20px;
+            cursor: pointer;
+            width: 100%;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            transition: 0.3s;
+        }
+
+        .main-btn:active {
+            transform: scale(0.98);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 6px 18px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 11px;
+            opacity: 0.7;
+            font-weight: bold;
+        }
+
+        .snowflake {
+            position: absolute;
+            background: var(--accent);
+            border-radius: 50%;
+            opacity: 0.6;
+            pointer-events: none;
+            z-index: 5;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="glass-card" id="main-card">
+        <div class="mantra-title">Radha Radha</div>
+        <div style="font-size: 11px; opacity: 0.6; margin-top: -5px;">Automatic Peace Mode</div>
+
+        <div class="circle-container">
+            <svg height="200" width="200">
+                <circle stroke="rgba(128,128,128,0.1)" stroke-width="12" fill="transparent" r="90" cx="100" cy="100" />
+                <circle class="progress-ring__circle" id="progress-circle" stroke-width="12" stroke-dasharray="565.48"
+                    stroke-dashoffset="565.48" fill="transparent" r="90" cx="100" cy="100" />
+            </svg>
+            <div class="count-num" id="count-display">0</div>
+        </div>
+
+        <div style="font-size: 12px; font-weight: bold; letter-spacing: 1px;">MALA PROGRESS</div>
+        <div class="goal-container">
+            <div id="goal-bar"></div>
+        </div>
+        <div style="font-size: 11px; margin-top: 8px; opacity: 0.7;">
+            Maala Count: <span id="mala-count" style="color:var(--accent); font-weight:bold;">0</span>
+        </div>
+
+        <div class="controls">
+            <button class="main-btn" id="start-btn" onclick="toggleJap()">Start Jaap</button>
+            <button class="theme-toggle" onclick="toggleTheme()">🌓 Change Theme</button>
+        </div>
+
+        <a href="javascript:void(0)" onclick="exitSession()"
+            style="color: var(--accent); text-decoration: none; font-size: 12px; display: block; margin-top: 25px; opacity: 0.6; font-weight: bold;">SAVE
+            & EXIT</a>
+    </div>
+
+    <!-- Background Music -->
+    <audio id="auto-audio" loop src="/static/audio/auto.mp3"></audio>
+
+    <script>
+        // 1. User ID ane Counters set karo
+        const userId = localStorage.getItem('jap_user_id');
+        let count = 0;
+        let dbTotalCount = 0;
+        let isPlaying = false;
+        let counterInterval;
+        const audioPlayer = document.getElementById('auto-audio');
+
+        const getBaseUrl = () => window.location.origin;
+
+        // Page load thaye tyare initialization
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (!userId) {
+                alert("Pehle main page par jaaiye jethi userId bani shake.");
+                window.location.href = '/';
+                return;
+            }
+
+            // Theme setup
+            if (localStorage.getItem('darkMode') === 'false') {
+                document.body.classList.add('light-mode');
+            }
+
+            await loadDataFromDB();
+        });
+
+        async function loadDataFromDB() {
+            try {
+                const response = await fetch(`${getBaseUrl()}/get_count?user_id=${userId}`);
+                const d = await response.json();
+
+                if (d.current_count !== undefined) {
+                    count = parseInt(d.current_count);
+                    dbTotalCount = parseInt(d.total_count);
+
+                    // Accurate total mate session start count track karo
+                    localStorage.setItem('jap_curr_at_start', count);
+
+                    document.getElementById('count-display').innerText = count;
+                    document.getElementById('mala-count').innerText = Math.floor(count / 108);
+                    updateUI();
+                }
+            } catch (err) {
+                console.error("Fetch error in loadDataFromDB:", err);
+            }
+        }
+
+        function toggleJap() {
+            if (isPlaying) stopJap(); else startJap();
+        }
+
+        function startJap() {
+            if (isPlaying) return;
+            isPlaying = true;
+
+            // Audio chalu karo
+            audioPlayer.play().catch(e => console.log("Audio play failed, user interaction jaroori chhe."));
+
+            document.getElementById('main-card').classList.add('card-active-effect');
+            document.getElementById('start-btn').innerText = "Pause Session";
+
+            counterInterval = setInterval(() => {
+                count++;
+                document.getElementById('count-display').innerText = count;
+
+                if (count % 108 === 0) {
+                    document.getElementById('mala-count').innerText = Math.floor(count / 108);
+                    confetti({ particleCount: 100, spread: 60, origin: { y: 0.7 } });
+                }
+
+                updateUI();
+                spawnSnowflake();
+            }, 900); // Speed control
+        }
+
+        function stopJap() {
+            if (!isPlaying) return;
+            isPlaying = false;
+
+            audioPlayer.pause();
+            document.getElementById('main-card').classList.remove('card-active-effect');
+            clearInterval(counterInterval);
+            document.getElementById('start-btn').innerText = "Resume Jaap";
+
+            saveToDB();
+        }
+
+        function saveToDB() {
+            const startCount = parseInt(localStorage.getItem('jap_curr_at_start')) || 0;
+            const sessionIncrease = count - startCount;
+            const finalTotal = dbTotalCount + sessionIncrease;
+
+            // Aa niche mujab na sudhara sathe fetch lakho
+            fetch(`${window.location.origin}/update_count`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    user_id: userId,
+                    current_count: count,
+                    total_count: finalTotal
+                })
+            })
+                .then(r => { if (!r.ok) console.log("Update failed"); })
+                .catch(e => console.log("Fetch error:", e));
+        }
+        function exitSession() {
+            if (isPlaying) stopJap(); else saveToDB();
+            setTimeout(() => {
+                window.location.href = '/';
+            }, 500);
+        }
+
+        function updateUI() {
+            const circle = document.getElementById('progress-circle');
+            const bar = document.getElementById('goal-bar');
+            const p = (count % 108) / 108;
+
+            // Progress circle logic
+            const offset = 565.48 - (p * 565.48);
+            if (circle) circle.style.strokeDashoffset = offset;
+
+            // Linear progress bar
+            if (bar) bar.style.width = (p * 100) + "%";
+        }
+
+        function toggleTheme() {
+            const isLight = document.body.classList.toggle('light-mode');
+            localStorage.setItem('darkMode', !isLight);
+        }
+
+        function spawnSnowflake() {
+            const s = document.createElement('div');
+            s.className = 'snowflake';
+            s.style.left = Math.random() * 100 + "vw";
+            s.style.top = "-10px";
+            let size = Math.random() * 5 + 2;
+            s.style.width = size + "px"; s.style.height = size + "px";
+            document.body.appendChild(s);
+            s.animate([
+                { transform: 'translateY(0)', opacity: 0.6 },
+                { transform: 'translateY(110vh)', opacity: 0 }
+            ], { duration: 4000 });
+            setTimeout(() => s.remove(), 4000);
+        }
+    </script>
+</body>
+
+</html>
