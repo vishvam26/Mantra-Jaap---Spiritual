@@ -503,14 +503,60 @@
         }
 
         function updateGoal() { goal = Math.max(108, document.getElementById('goal-input').value); updateUI(); }
-        function saveNotif() { localStorage.setItem('pTime', document.getElementById('notif-time').value); Notification.requestPermission(); }
+        function saveNotif() {
+            const val = document.getElementById('notif-time').value;
+            if (!val) {
+                alert("Please select a valid time first.");
+                return;
+            }
+            localStorage.setItem('pTime', val);
+            Notification.requestPermission().then(permission => {
+                if (permission === 'granted') {
+                    alert("Radhe Radhe! Notification permission granted. Reminder set successfully.");
+                } else if (permission === 'denied') {
+                    alert("Warning: Notification permission denied. Please allow notifications in your browser site settings to receive reminders.");
+                }
+            });
+        }
 
         function checkNotif() {
             const setT = localStorage.getItem('pTime');
+            if (!setT) return;
+            
             const now = new Date();
-            const nowT = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
-            if (setT === nowT && Notification.permission === "granted") {
-                new Notification("Radhe Radhe!", { body: quotes[Math.floor(Math.random() * quotes.length)] });
+            const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+            const lastSent = localStorage.getItem('lastNotifDate');
+            
+            // If notification already sent today, skip
+            if (lastSent === todayStr) return;
+            
+            const [setHours, setMinutes] = setT.split(':').map(Number);
+            const currentHours = now.getHours();
+            const currentMinutes = now.getMinutes();
+            
+            // Check if current time is past or equal to the reminder time
+            if (currentHours > setHours || (currentHours === setHours && currentMinutes >= setMinutes)) {
+                if (Notification.permission === "granted") {
+                    const title = "Radhe Radhe!";
+                    const options = {
+                        body: quotes[Math.floor(Math.random() * quotes.length)],
+                        icon: '/static/logo.png',
+                        badge: '/static/logo.png'
+                    };
+                    
+                    // Mark as sent immediately to avoid duplicates
+                    localStorage.setItem('lastNotifDate', todayStr);
+                    
+                    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+                        navigator.serviceWorker.ready.then(reg => {
+                            reg.showNotification(title, options);
+                        }).catch(() => {
+                            new Notification(title, options);
+                        });
+                    } else {
+                        new Notification(title, options);
+                    }
+                }
             }
         }
 
