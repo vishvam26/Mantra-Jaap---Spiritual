@@ -57,11 +57,38 @@ app.get('/aarti.html', (req, res) => {
 
 // --- API Routes ---
 
+// Helper function to check if the query is spiritual/devotional
+const isSpiritualQuery = (query) => {
+    if (!query) return false;
+    const q = query.toLowerCase();
+    
+    const spiritualKeywords = [
+        // Devotional terms
+        'aarti', 'arti', 'bhajan', 'kirtan', 'dhun', 'chalisa', 'stotra', 'mantra', 'jap', 'jaap', 'shloka', 'stuti', 
+        'devotional', 'spiritual', 'path', 'paath', 'prayer', 'bhakti', 'gita', 'geeta', 'chants', 'chanting', 'kathaa', 'katha',
+        // Deity/Spiritual Names (English/Hindi transliteration)
+        'ganesh', 'ganpati', 'hanuman', 'ram', 'rama', 'krishna', 'shiva', 'shiv', 'mahadev', 'bholenath', 'durga', 
+        'laxmi', 'lakshmi', 'saraswati', 'vishnu', 'radha', 'radhe', 'swaminarayan', 'sai', 'bhagwan', 'narayan', 
+        'kali', 'amritwani', 'ganesha', 'govinda', 'radheshyam', 'shyam', 'murli', 'baba', 'mata', 'mataji', 'devi', 
+        'ambaji', 'khodiyar', 'mogal', 'bahuchar', 'gayatri', 'sharda', 'bramha', 'sarangpur', 'salangpur', 'kashtbhanjan',
+        // Gujarati script support for key terms
+        'આરતી', 'આરતિ', 'ભજન', 'કીર્તન', 'કીર્તનો', 'ધૂન', 'ચાલીસા', 'સ્તોત્ર', 'મંત્ર', 'જાપ', 'શ્લોક', 'સ્તુતિ', 'ભક્તિ', 'ગીતા', 'કથા',
+        'ગણેશ', 'ગણપતિ', 'હનુમાન', 'રામ', 'કૃષ્ણ', 'શિવ', 'મહાદેવ', 'દુર્ગા', 'લક્ષ્મી', 'સરસ્વતી', 'વિષ્ણુ', 'રાધા', 'રાધે', 'સ્વામિનારાયણ', 'સાઈ'
+    ];
+    
+    return spiritualKeywords.some(keyword => q.includes(keyword));
+};
+
 // API to search Aarti videos from YouTube without API Key
 app.get('/api/search_aarti', async (req, res) => {
     const query = req.query.q;
     if (!query) {
         return res.status(400).json({ error: 'Search query missing' });
+    }
+    
+    // Restrict search results to spiritual/devotional queries only
+    if (!isSpiritualQuery(query)) {
+        return res.json([]); // Return empty list for unrelated searches
     }
     
     // Append "aarti" to query if not present to ensure relevant devotional results
