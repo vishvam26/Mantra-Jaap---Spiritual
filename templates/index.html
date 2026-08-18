@@ -529,16 +529,53 @@
             });
         }
 
+        function showLocalToast(message) {
+            let toast = document.createElement('div');
+            toast.innerText = message;
+            toast.style.position = 'fixed';
+            toast.style.top = '25px';
+            toast.style.left = '50%';
+            toast.style.transform = 'translateX(-50%) translateY(-20px)';
+            toast.style.background = 'rgba(255, 255, 255, 0.15)';
+            toast.style.backdropFilter = 'blur(15px)';
+            toast.style.webkitBackdropFilter = 'blur(15px)';
+            toast.style.border = '1px solid rgba(255, 255, 255, 0.2)';
+            toast.style.color = '#ffffff';
+            toast.style.padding = '14px 28px';
+            toast.style.borderRadius = '20px';
+            toast.style.boxShadow = '0 10px 35px rgba(0,0,0,0.35)';
+            toast.style.zIndex = '99999';
+            toast.style.fontWeight = '700';
+            toast.style.fontSize = '0.95rem';
+            toast.style.textAlign = 'center';
+            toast.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+            toast.style.opacity = '0';
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '1';
+                toast.style.transform = 'translateX(-50%) translateY(0)';
+            }, 100);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(-50%) translateY(-20px)';
+                setTimeout(() => toast.remove(), 400);
+            }, 6000);
+        }
+
         function checkNotif() {
             const setT = localStorage.getItem('pTime');
             if (!setT) return;
             
             const now = new Date();
             const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-            const lastSent = localStorage.getItem('lastNotifDate');
+            const lastSentDate = localStorage.getItem('lastNotifDate');
+            const lastSentTime = localStorage.getItem('lastNotifTime');
             
-            // If notification already sent today, skip
-            if (lastSent === todayStr) return;
+            // If already sent for this specific date and time, skip
+            if (lastSentDate === todayStr && lastSentTime === setT) return;
             
             const [setHours, setMinutes] = setT.split(':').map(Number);
             const currentHours = now.getHours();
@@ -546,16 +583,22 @@
             
             // Check if current time is past or equal to the reminder time
             if (currentHours > setHours || (currentHours === setHours && currentMinutes >= setMinutes)) {
+                const bodyText = quotes[Math.floor(Math.random() * quotes.length)];
+                
+                // Show a beautiful in-app floating toast (always works, even in non-secure/blocked environments)
+                showLocalToast("🌸 Radhe Radhe! Reminder: " + bodyText);
+                
+                // Save immediately to prevent duplicate triggers
+                localStorage.setItem('lastNotifDate', todayStr);
+                localStorage.setItem('lastNotifTime', setT);
+                
                 if (Notification.permission === "granted") {
                     const title = "Radhe Radhe!";
                     const options = {
-                        body: quotes[Math.floor(Math.random() * quotes.length)],
+                        body: bodyText,
                         icon: '/static/logo.png',
                         badge: '/static/logo.png'
                     };
-                    
-                    // Mark as sent immediately to avoid duplicates
-                    localStorage.setItem('lastNotifDate', todayStr);
                     
                     if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
                         navigator.serviceWorker.ready.then(reg => {
