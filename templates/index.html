@@ -486,7 +486,10 @@
             grid.innerHTML = '';
             for (let i = 0; i < 7; i++) {
                 let d = new Date(); d.setDate(d.getDate() - (6 - i));
-                let dStr = d.toISOString().split('T')[0];
+                let year = d.getFullYear();
+                let month = String(d.getMonth() + 1).padStart(2, '0');
+                let day = String(d.getDate()).padStart(2, '0');
+                let dStr = `${year}-${month}-${day}`;
                 let val = (dStr === today) ? curr : (history[dStr] || 0);
                 let h = Math.min((val / goal) * 60, 60);
                 grid.innerHTML += `<div style="display:flex; flex-direction:column; align-items:center; flex:1;"><div class="bar" style="height:${h}px"></div><span style="font-size:0.6rem; opacity:0.6;">${d.toLocaleDateString('en', { weekday: 'short' })}</span></div>`;
