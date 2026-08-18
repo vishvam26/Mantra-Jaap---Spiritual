@@ -172,8 +172,16 @@
 <body>
 
     <div class="glass-card" id="main-card">
-        <div class="mantra-title">Radha Radha</div>
-        <div style="font-size: 11px; opacity: 0.6; margin-top: -5px;">Automatic Peace Mode</div>
+        <div style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
+            <select id="lang-select" onchange="changeLang(this.value)" style="background: var(--glass); border: 1px solid var(--p); color: var(--text-color); padding: 4px 8px; border-radius: 50px; cursor: pointer; font-size: 0.75rem; font-weight: 600; outline: none;">
+                <option value="gu" style="background:#1a1a1a; color:#fff;">ગુજરાતી</option>
+                <option value="hi" style="background:#1a1a1a; color:#fff;">हिन्दी</option>
+                <option value="en" style="background:#1a1a1a; color:#fff;">English</option>
+            </select>
+        </div>
+
+        <div class="mantra-title" id="auto-mantra-title">Radha Radha</div>
+        <div id="auto-peace-mode" style="font-size: 11px; opacity: 0.6; margin-top: -5px;">Automatic Peace Mode</div>
 
         <div class="circle-container">
             <svg height="200" width="200">
@@ -184,20 +192,20 @@
             <div class="count-num" id="count-display">0</div>
         </div>
 
-        <div style="font-size: 12px; font-weight: bold; letter-spacing: 1px;">MALA PROGRESS</div>
+        <div id="mala-progress-title" style="font-size: 12px; font-weight: bold; letter-spacing: 1px;">MALA PROGRESS</div>
         <div class="goal-container">
             <div id="goal-bar"></div>
         </div>
         <div style="font-size: 11px; margin-top: 8px; opacity: 0.7;">
-            Maala Count: <span id="mala-count" style="color:var(--accent); font-weight:bold;">0</span>
+            <span id="mala-count-label">Maala Count:</span> <span id="mala-count" style="color:var(--accent); font-weight:bold;">0</span>
         </div>
 
         <div class="controls">
             <button class="main-btn" id="start-btn" onclick="toggleJap()">Start Jaap</button>
-            <button class="theme-toggle" onclick="toggleTheme()">🌓 Change Theme</button>
+            <button class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()">🌓 Change Theme</button>
         </div>
 
-        <a href="javascript:void(0)" onclick="exitSession()"
+        <a href="javascript:void(0)" onclick="exitSession()" id="save-exit-btn"
             style="color: var(--accent); text-decoration: none; font-size: 12px; display: block; margin-top: 25px; opacity: 0.6; font-weight: bold;">SAVE
             & EXIT</a>
     </div>
@@ -216,10 +224,79 @@
 
         const getBaseUrl = () => window.location.origin;
 
+        // --- Multi-language (i18n) Setup ---
+        const i18n = {
+            gu: {
+                title: "ઓટો જાપ - સ્પિરિચ્યુઅલ ટ્રેકર",
+                autoPeaceMode: "ઓટોમેટિક પીસ મોડ",
+                malaProgress: "માળા પ્રગતિ",
+                malaCount: "માળા કાઉન્ટ:",
+                startJaap: "જાપ શરૂ કરો",
+                pauseSession: "પોઝ કરો",
+                resumeJaap: "જાપ ચાલુ કરો",
+                changeTheme: "🌓 થીમ બદલો",
+                saveExit: "સેવ અને બહાર નીકળો",
+                alertUser: "કૃપા કરીને પેલા મુખ્ય પેજ પર જાઓ જેથી યુઝર આઈડી બની શકે."
+            },
+            hi: {
+                title: "ऑटो जाप - स्पिरिचुअल ट्रैकर",
+                autoPeaceMode: "ऑटोमेटिक शांति मोड",
+                malaProgress: "माला प्रगति",
+                malaCount: "माला काउंट:",
+                startJaap: "जाप शुरू करें",
+                pauseSession: "रोकें",
+                resumeJaap: "जाप जारी रखें",
+                changeTheme: "🌓 थीम बदलें",
+                saveExit: "सुरक्षित करें और बाहर जाएं",
+                alertUser: "कृपया पहले मुख्य पृष्ठ पर जाएं ताकि यूजर आईडी बन सके।"
+            },
+            en: {
+                title: "Auto-Jap - Spiritual Tracker",
+                autoPeaceMode: "Automatic Peace Mode",
+                malaProgress: "MALA PROGRESS",
+                malaCount: "Maala Count:",
+                startJaap: "Start Jaap",
+                pauseSession: "Pause Session",
+                resumeJaap: "Resume Jaap",
+                changeTheme: "🌓 Change Theme",
+                saveExit: "SAVE & EXIT",
+                alertUser: "Please go to the main page first so that a user ID can be created."
+            }
+        };
+
+        function changeLang(lang) {
+            localStorage.setItem('jap_lang', lang);
+            applyLanguage(lang);
+        }
+
+        function applyLanguage(lang) {
+            const t = i18n[lang] || i18n['gu'];
+            document.getElementById('lang-select').value = lang;
+            
+            document.title = t.title;
+            document.getElementById('auto-peace-mode').innerText = t.autoPeaceMode;
+            document.getElementById('mala-progress-title').innerText = t.malaProgress;
+            document.getElementById('mala-count-label').innerText = t.malaCount;
+            document.getElementById('theme-toggle-btn').innerText = t.changeTheme;
+            document.getElementById('save-exit-btn').innerText = t.saveExit;
+            
+            // Start button text state update
+            const btn = document.getElementById('start-btn');
+            if (isPlaying) {
+                btn.innerText = t.pauseSession;
+            } else if (count > 0) {
+                btn.innerText = t.resumeJaap;
+            } else {
+                btn.innerText = t.startJaap;
+            }
+        }
+
         // Page load thaye tyare initialization
         document.addEventListener('DOMContentLoaded', async () => {
+            const savedLang = localStorage.getItem('jap_lang') || 'gu';
+            
             if (!userId) {
-                alert("Pehle main page par jaaiye jethi userId bani shake.");
+                alert(i18n[savedLang].alertUser);
                 window.location.href = '/';
                 return;
             }
@@ -228,6 +305,9 @@
             if (localStorage.getItem('darkMode') === 'false') {
                 document.body.classList.add('light-mode');
             }
+
+            // Apply translation
+            applyLanguage(savedLang);
 
             await loadDataFromDB();
         });
@@ -265,7 +345,8 @@
             audioPlayer.play().catch(e => console.log("Audio play failed, user interaction jaroori chhe."));
 
             document.getElementById('main-card').classList.add('card-active-effect');
-            document.getElementById('start-btn').innerText = "Pause Session";
+            const savedLang = localStorage.getItem('jap_lang') || 'gu';
+            document.getElementById('start-btn').innerText = i18n[savedLang].pauseSession;
 
             counterInterval = setInterval(() => {
                 count++;
@@ -288,7 +369,8 @@
             audioPlayer.pause();
             document.getElementById('main-card').classList.remove('card-active-effect');
             clearInterval(counterInterval);
-            document.getElementById('start-btn').innerText = "Resume Jaap";
+            const savedLang2 = localStorage.getItem('jap_lang') || 'gu';
+            document.getElementById('start-btn').innerText = i18n[savedLang2].resumeJaap;
 
             saveToDB();
         }

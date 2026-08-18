@@ -387,18 +387,25 @@
 <body>
 
     <div class="top-row">
-        <a href="/" class="back-btn">← Home</a>
-        <h2 style="font-family:'Crimson Pro', serif; margin: 0; font-size: 1.5rem; color: var(--p);">Spiritual Player</h2>
+        <a href="/" class="back-btn" id="nav-home">← Home</a>
+        <h2 id="sp-player-title" style="font-family:'Crimson Pro', serif; margin: 0; font-size: 1.5rem; color: var(--p);">Spiritual Player</h2>
+        
+        <select id="lang-select" onchange="changeLang(this.value)" style="background: var(--glass); border: 1px solid var(--p); color: var(--text-color); padding: 6px 10px; border-radius: 50px; cursor: pointer; font-size: 0.8rem; font-weight: 600; outline: none; margin: 0 5px;">
+            <option value="gu" style="background:#1a1a1a; color:#fff;">ગુજરાતી</option>
+            <option value="hi" style="background:#1a1a1a; color:#fff;">हिन्दी</option>
+            <option value="en" style="background:#1a1a1a; color:#fff;">English</option>
+        </select>
+        
         <button class="theme-toggle" onclick="toggleMode()" id="mode-icon">🌙</button>
     </div>
 
     <div class="glass-card">
-        <h1 style="font-family:'Crimson Pro', serif; font-size: 2.2rem; margin: 0 0 10px 0; color: var(--p);">🌸 Aarti & Bhajans 🌸</h1>
-        <p style="font-size: 0.8rem; opacity: 0.7; margin-bottom: 20px;">તમારી મનગમતી આરતી કે ભજન સર્ચ કરીને સાંભળો</p>
+        <h1 id="aarti-section-title" style="font-family:'Crimson Pro', serif; font-size: 2.2rem; margin: 0 0 10px 0; color: var(--p);">🌸 Aarti & Bhajans 🌸</h1>
+        <p id="aarti-tagline" style="font-size: 0.8rem; opacity: 0.7; margin-bottom: 20px;">તમારી મનગમતી આરતી કે ભજન સર્ચ કરીને સાંભળો</p>
         
         <div class="search-row">
             <input type="text" id="search-input" class="in-box" placeholder="દા.ત. Ganesh Aarti, Hanuman Chalisa..." onkeypress="handleKeyPress(event)">
-            <button class="search-btn" onclick="performSearch()">Search</button>
+            <button class="search-btn" id="search-btn-text" onclick="performSearch()">Search</button>
         </div>
 
         <div class="quick-tags">
@@ -415,7 +422,7 @@
     <!-- Search Results -->
     <div class="results-container" id="results-grid">
         <!-- Results will be injected dynamically -->
-        <p style="text-align: center; opacity: 0.5; font-size: 0.9rem; margin-top: 20px;">કોઈ આરતી સર્ચ કરો...</p>
+        <p id="search-prompt-text" style="text-align: center; opacity: 0.5; font-size: 0.9rem; margin-top: 20px;">કોઈ આરતી સર્ચ કરો...</p>
     </div>
 
     <!-- Floating Audio Player Card -->
@@ -496,7 +503,84 @@
             }
         }
 
-        // Initialize theme on load
+        // --- Multi-language (i18n) Setup ---
+        const i18n = {
+            gu: {
+                title: "આરતી અને ભજનો",
+                navHome: "← હોમ",
+                spPlayer: "આધ્યાત્મિક પ્લેયર",
+                aartiBhajans: "🌸 આરતી અને ભજનો 🌸",
+                tagline: "તમારી મનગમતી આરતી કે ભજન સર્ચ કરીને સાંભળો",
+                searchPlaceholder: "દા.ત. Ganesh Aarti, Hanuman Chalisa...",
+                searchBtn: "સર્ચ",
+                searchPrompt: "કોઈ આરતી સર્ચ કરો...",
+                playingLabel: "આરતી વાગી રહી છે...",
+                alertReady: "પ્લેયર હજુ રેડી થઈ રહ્યું છે. પ્લીઝ ૨ સેકન્ડ રાહ જુઓ.",
+                alertError: "સર્ચ કનેક્શન એરર. પ્લીઝ ફરી ટ્રાય કરો.",
+                alertNoResults: "કોઈ પરિણામો ન મળ્યા."
+            },
+            hi: {
+                title: "आरती और भजन",
+                navHome: "← होम",
+                spPlayer: "आध्यात्मिक प्लेयर",
+                aartiBhajans: "🌸 आरती और भजन 🌸",
+                tagline: "अपनी पसंदीदा आरती या भजन खोजकर सुनें",
+                searchPlaceholder: "जैसे: Ganesh Aarti, Hanuman Chalisa...",
+                searchBtn: "खोजें",
+                searchPrompt: "कोई आरती खोजें...",
+                playingLabel: "आरती चल रही है...",
+                alertReady: "प्लेयर अभी तैयार हो रहा है। कृपया २ सेकंड प्रतीक्षा करें।",
+                alertError: "खोज कनेक्शन त्रुटि। कृपया पुन: प्रयास करें।",
+                alertNoResults: "कोई परिणाम नहीं मिला।"
+            },
+            en: {
+                title: "Aarti & Bhajans",
+                navHome: "← Home",
+                spPlayer: "Spiritual Player",
+                aartiBhajans: "🌸 Aarti & Bhajans 🌸",
+                tagline: "Listen to your favorite Aarti or Bhajan by searching",
+                searchPlaceholder: "e.g. Ganesh Aarti, Hanuman Chalisa...",
+                searchBtn: "Search",
+                searchPrompt: "Search for an Aarti...",
+                playingLabel: "Playing Aarti...",
+                alertReady: "Player is still loading. Please wait 2 seconds.",
+                alertError: "Search connection error. Please try again.",
+                alertNoResults: "No results found."
+            }
+        };
+
+        function changeLang(lang) {
+            localStorage.setItem('jap_lang', lang);
+            applyLanguage(lang);
+        }
+
+        function applyLanguage(lang) {
+            const t = i18n[lang] || i18n['gu'];
+            document.getElementById('lang-select').value = lang;
+
+            // Update document title
+            document.title = t.title + " - Spiritual Tracker";
+
+            // Update DOM text contents
+            document.getElementById('nav-home').innerText = t.navHome;
+            document.getElementById('sp-player-title').innerText = t.spPlayer;
+            document.getElementById('aarti-section-title').innerText = t.aartiBhajans;
+            document.getElementById('aarti-tagline').innerText = t.tagline;
+            document.getElementById('search-input').placeholder = t.searchPlaceholder;
+            document.getElementById('search-btn-text').innerText = t.searchBtn;
+            
+            const promptText = document.getElementById('search-prompt-text');
+            if (promptText) {
+                promptText.innerText = t.searchPrompt;
+            }
+            
+            const currentTitle = document.getElementById('current-title');
+            if (currentTitle && (currentTitle.innerText === "Playing Aarti..." || currentTitle.innerText === "आरती चल रही है..." || currentTitle.innerText === "આરતી વાગી રહી છે...")) {
+                currentTitle.innerText = t.playingLabel;
+            }
+        }
+
+        // Initialize theme and language on load
         window.onload = () => {
             // Apply Dark/Light mode
             const isDark = localStorage.getItem('darkMode') !== 'false';
@@ -507,6 +591,10 @@
             
             // Sync theme variables
             setTheme(activeTheme);
+
+            // Apply saved language
+            const savedLang = localStorage.getItem('jap_lang') || 'gu';
+            applyLanguage(savedLang);
         };
 
         function toggleMode() {
@@ -558,7 +646,8 @@
                 spinner.style.display = 'none';
 
                 if (!results || results.length === 0) {
-                    grid.innerHTML = `<p style="text-align: center; opacity: 0.5; margin-top: 20px;">કોઈ પરિણામો ન મળ્યા.</p>`;
+                    const currentLang = localStorage.getItem('jap_lang') || 'gu';
+                    grid.innerHTML = `<p style="text-align: center; opacity: 0.5; margin-top: 20px;">${i18n[currentLang].alertNoResults}</p>`;
                     return;
                 }
 
@@ -578,13 +667,15 @@
             } catch (err) {
                 console.error("Search error:", err);
                 spinner.style.display = 'none';
-                grid.innerHTML = `<p style="text-align: center; color: #ef4444; margin-top: 20px;">સર્ચ કનેક્શન એરર. પ્લીઝ ફરી ટ્રાય કરો.</p>`;
+                const currentLang = localStorage.getItem('jap_lang') || 'gu';
+                grid.innerHTML = `<p style="text-align: center; color: #ef4444; margin-top: 20px;">${i18n[currentLang].alertError}</p>`;
             }
         }
 
         function playAarti(videoId, title) {
             if (!isPlayerReady || !player) {
-                alert("પ્લેયર હજુ રેડી થઈ રહ્યું છે. પ્લીઝ ૨ સેકન્ડ રાહ જુઓ.");
+                const currentLang = localStorage.getItem('jap_lang') || 'gu';
+                alert(i18n[currentLang].alertReady);
                 return;
             }
 

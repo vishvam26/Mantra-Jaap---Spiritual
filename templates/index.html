@@ -274,9 +274,17 @@
 <body id="main-body">
 
     <div class="top-row">
-        <div class="stat-card">🔥 Streak: <span id="streak">0</span></div>
+        <div class="stat-card" id="streak-card">🔥 Streak: <span id="streak">0</span></div>
         <button class="mode-toggle" onclick="toggleMode()" id="mode-icon">🌙</button>
-        <div class="stat-card">🏆 Total: <span id="total-c">0</span></div>
+        <div class="stat-card" id="total-card">🏆 Total: <span id="total-c">0</span></div>
+    </div>
+
+    <div style="display: flex; justify-content: center; margin-top: 10px; margin-bottom: 5px;">
+        <select id="lang-select" onchange="changeLang(this.value)" style="background: var(--glass); border: 1px solid var(--p); color: var(--text-color); padding: 5px 12px; border-radius: 50px; cursor: pointer; font-size: 0.8rem; font-weight: 600; outline: none; transition: 0.3s;">
+            <option value="gu" style="background:#1a1a1a; color:#fff;">ગુજરાતી</option>
+            <option value="hi" style="background:#1a1a1a; color:#fff;">हिन्दी</option>
+            <option value="en" style="background:#1a1a1a; color:#fff;">English</option>
+        </select>
     </div>
 
     <div class="theme-tabs">
@@ -287,7 +295,7 @@
 
     <div class="glass-card">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
-            <label style="font-size:0.7rem; font-weight:600;">Reminder:</label>
+            <label style="font-size:0.7rem; font-weight:600;" id="reminder-label">Reminder:</label>
             <input type="time" id="notif-time" onchange="saveNotif()"
                 style="border:none; background:rgba(255,255,255,0.1); color:var(--text-color); padding:5px; border-radius:8px;">
         </div>
@@ -301,7 +309,7 @@
             <option value="Hare Krishna" data-sound="krishna.mp3">Hare Krishna</option>
         </select>
         <div style="margin-top:12px; display:flex; justify-content:space-between; align-items:center;">
-            <label style="font-size:0.85rem; font-weight:600;">Goal:</label>
+            <label style="font-size:0.85rem; font-weight:600;" id="goal-label">Goal:</label>
             <input type="number" id="goal-input" class="in-box" value="108" min="108" onchange="updateGoal()"
                 style="width:75px; margin:0;">
         </div>
@@ -315,28 +323,28 @@
 
     <div class="counter-ring" id="circle">
         <h2 id="count-num">0</h2>
-        <span style="font-size:0.8rem; font-weight:700; opacity:0.6;">GOAL: <span id="goal-val">108</span></span>
+        <span style="font-size:0.8rem; font-weight:700; opacity:0.6;"><span id="goal-text">GOAL</span>: <span id="goal-val">108</span></span>
     </div>
 
-    <button class="jap-btn" onclick="handleJap()">JAP KARO</button>
+    <button class="jap-btn" id="jap-btn-text" onclick="handleJap()">JAP KARO</button>
 
     <div style="text-align: center;">
         <button class="hold-reset" id="reset-btn" onmousedown="startH()" onmouseup="stopH()" ontouchstart="startH()"
             ontouchend="stopH()">🔄</button>
-        <p style="font-size:0.7rem; opacity:0.5; margin-top:5px;">Hold to Reset Today</p>
+        <p style="font-size:0.7rem; opacity:0.5; margin-top:5px;" id="reset-prompt-text">Hold to Reset Today</p>
     </div>
 
     <div style="text-align: center; margin: 20px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
-        <a href="auto-jap.html" class="auto-link">Auto-Jap Mode →</a>
-        <a href="aarti.html" class="auto-link" style="border-color: #ff9800;">🌸 Aarti Section →</a>
+        <a href="auto-jap.html" class="auto-link" id="auto-jap-btn-text">Auto-Jap Mode →</a>
+        <a href="aarti.html" class="auto-link" id="aarti-btn-text" style="border-color: #ff9800;">🌸 Aarti Section →</a>
     </div>
 
     <div class="glass-card">
-        <span style="font-size:0.75rem; font-weight:700; opacity:0.6;">WEEKLY ACTIVITY</span>
+        <span style="font-size:0.75rem; font-weight:700; opacity:0.6;" id="weekly-activity-title">WEEKLY ACTIVITY</span>
         <div class="report-grid" id="report-grid"></div>
     </div>
 
-    <button class="jap-btn" onclick="downloadBhaktiCard()" style="font-size: 1rem; padding: 12px; margin-top: 10px;">📤
+    <button class="jap-btn" id="share-btn-text" onclick="downloadBhaktiCard()" style="font-size: 1rem; padding: 12px; margin-top: 10px;">📤
         SHARE CARD</button>
 
     <div class="badge-row">
@@ -376,6 +384,123 @@
         const quotes = ["Karma karo, fal ni chinta na karo.", "Mann shant hoy to badhu jiti shakay.", "Radhe Radhe bolva thi mann shant thay."];
         const getBaseUrl = () => window.location.origin;
 
+        // --- Multi-language (i18n) Setup ---
+        const i18n = {
+            gu: {
+                title: "મંત્ર જાપ - આધ્યાત્મિક ટ્રેકર",
+                streak: "સ્ટ્રીક:",
+                total: "કુલ:",
+                reminder: "રીમાઇન્ડર સેટ કરો:",
+                goal: "લક્ષ્ય (ન્યૂનતમ 108):",
+                goalText: "લક્ષ્ય",
+                japBtn: "જાપ કરો",
+                holdReset: "આજના જાપ રીસેટ કરવા દબાવી રાખો",
+                autoJap: "ઓટો-જાપ મોડ →",
+                aartiSection: "🌸 આરતી સેક્શન →",
+                weeklyActivity: "સાપ્તાહિક પ્રવૃત્તિ",
+                shareCard: "📤 કાર્ડ શેર કરો",
+                certTitle: "મંત્ર જાપ પ્રમાણપત્ર",
+                certTotal: "કુલ જાપ:",
+                certStreak: "સ્ટ્રીક:",
+                certDays: "દિવસો",
+                designedBy: "ડિઝાઇન બાય",
+                alertResetConfirm: "આજે કરેલા જાપ રીસેટ કરવા છે?",
+                alertReminderSuccess: "રીમાઇન્ડર સેટ થઈ ગયું છે!",
+                alertPermissionDenied: "કૃપા કરીને બ્રાઉઝર સેટિંગ્સમાં નોટિફિકેશન પરમિશન ચાલુ કરો.",
+                toastPrefix: "🌸 રાધે રાધે! રિમાઇન્ડર: "
+            },
+            hi: {
+                title: "मंत्र जाप - आध्यात्मिक ट्रैकर",
+                streak: "क्रम:",
+                total: "कुल:",
+                reminder: "रिमाइंडर सेट करें:",
+                goal: "लक्ष्य (न्यूनतम 108):",
+                goalText: "लक्ष्य",
+                japBtn: "जाप करें",
+                holdReset: "आज के जाप रीसेट करने के लिए दबाए रखें",
+                autoJap: "ऑटो-जाप मोड →",
+                aartiSection: "🌸 आरती सेक्शन →",
+                weeklyActivity: "साप्ताहिक गतिविधि",
+                shareCard: "📤 कार्ड साझा करें",
+                certTitle: "मंत्र जाप प्रमाणपत्र",
+                certTotal: "कुल जाप:",
+                certStreak: "क्रम:",
+                certDays: "दिन",
+                designedBy: "द्वारा डिज़ाइन किया गया",
+                alertResetConfirm: "क्या आप आज के जाप रीसेट करना चाहते हैं?",
+                alertReminderSuccess: "रिमाइंडर सेट कर दिया गया है!",
+                alertPermissionDenied: "कृपया ब्राउज़र सेटिंग्स में नोटिफिकेशन अनुमति चालू करें।",
+                toastPrefix: "🌸 राधे राधे! रिमाइंडर: "
+            },
+            en: {
+                title: "Mantra Jaap - Spiritual Tracker",
+                streak: "Streak:",
+                total: "Total:",
+                reminder: "Set Reminder:",
+                goal: "Goal (Min 108):",
+                goalText: "GOAL",
+                japBtn: "JAP KARO",
+                holdReset: "Hold to Reset Today",
+                autoJap: "Auto-Jap Mode →",
+                aartiSection: "🌸 Aarti Section →",
+                weeklyActivity: "WEEKLY ACTIVITY",
+                shareCard: "📤 SHARE CARD",
+                certTitle: "MANTRA JAP CERTIFICATE",
+                certTotal: "Total Jap:",
+                certStreak: "Streak:",
+                certDays: "Days",
+                designedBy: "DESIGNED BY",
+                alertResetConfirm: "Do you want to reset today's jap?",
+                alertReminderSuccess: "Reminder has been set successfully!",
+                alertPermissionDenied: "Please enable notification permissions in browser settings.",
+                toastPrefix: "🌸 Radhe Radhe! Reminder: "
+            }
+        };
+
+        function changeLang(lang) {
+            localStorage.setItem('jap_lang', lang);
+            applyLanguage(lang);
+        }
+
+        function applyLanguage(lang) {
+            const t = i18n[lang] || i18n['gu'];
+            document.getElementById('lang-select').value = lang;
+            
+            document.title = t.title;
+            
+            // Streak and Total labels
+            const streakNum = document.getElementById('streak').innerText;
+            const totalNum = document.getElementById('total-c').innerText;
+            document.getElementById('streak-card').innerHTML = `🔥 ${t.streak} <span id="streak">${streakNum}</span>`;
+            document.getElementById('total-card').innerHTML = `🏆 ${t.total} <span id="total-c">${totalNum}</span>`;
+            
+            document.getElementById('reminder-label').innerText = t.reminder;
+            document.getElementById('goal-label').innerText = t.goal;
+            document.getElementById('goal-text').innerText = t.goalText;
+            document.getElementById('jap-btn-text').innerText = t.japBtn;
+            document.getElementById('reset-prompt-text').innerText = t.holdReset;
+            document.getElementById('auto-jap-btn-text').innerText = t.autoJap;
+            document.getElementById('aarti-btn-text').innerText = t.aartiSection;
+            document.getElementById('weekly-activity-title').innerText = t.weeklyActivity;
+            document.getElementById('share-btn-text').innerText = t.shareCard;
+            
+            // Footer designed by
+            const footer = document.querySelector('footer');
+            if (footer) {
+                footer.innerHTML = `${t.designedBy} <b style="color:var(--p)">VISHVAM PRAJAPATI</b> <br><span style="font-family:'Crimson Pro', serif; font-size:1.1rem; color:var(--s)">🌸 Radhe Radhe 🌸</span>`;
+            }
+            
+            // Cert translations
+            const certTitle = document.querySelector('#bhakti-card-hidden h3');
+            if (certTitle) certTitle.innerText = t.certTitle;
+            
+            const cardTotalText = document.querySelector('#bhakti-card-hidden p:nth-of-type(1)');
+            if (cardTotalText) cardTotalText.innerHTML = `${t.certTotal} <span id="card-total">${total}</span>`;
+            
+            const cardStreakText = document.querySelector('#bhakti-card-hidden p:nth-of-type(2)');
+            if (cardStreakText) cardStreakText.innerHTML = `${t.certStreak} <span id="card-streak">${document.getElementById('streak').innerText}</span> ${t.certDays}`;
+        }
+
         window.onload = () => {
             fetch(`${window.location.origin}/get_count?user_id=${userId}`)
                 .then(r => r.json())
@@ -387,6 +512,10 @@
                     document.getElementById('streak').innerText = d.streak || 0;
                     updateUI();
                     updateReport(d.history, d.today);
+                    
+                    // Apply language after data loads to populate counts correctly
+                    const savedLang = localStorage.getItem('jap_lang') || 'gu';
+                    applyLanguage(savedLang);
                 });
 
             const darkModeSaved = localStorage.getItem('darkMode');
@@ -487,7 +616,8 @@
         function startH() {
             document.getElementById('reset-btn').style.transform = "scale(0.9)";
             hTimer = setTimeout(() => {
-                if (confirm("Aaje karela jap reset karva chhe?")) { curr = 0; updateUI(); save(); }
+                const savedLang = localStorage.getItem('jap_lang') || 'gu';
+                if (confirm(i18n[savedLang].alertResetConfirm)) { curr = 0; updateUI(); save(); }
             }, 1500);
         }
         function stopH() { document.getElementById('reset-btn').style.transform = "scale(1)"; clearTimeout(hTimer); }
@@ -516,16 +646,17 @@
         function updateGoal() { goal = Math.max(108, document.getElementById('goal-input').value); updateUI(); }
         function saveNotif() {
             const val = document.getElementById('notif-time').value;
+            const savedLang = localStorage.getItem('jap_lang') || 'gu';
             if (!val) {
-                alert("Please select a valid time first.");
+                alert(savedLang === 'en' ? "Please select a valid time first." : savedLang === 'hi' ? "कृपया पहले एक वैध समय चुनें।" : "કૃપા કરીને પેલા યોગ્ય સમય પસંદ કરો.");
                 return;
             }
             localStorage.setItem('pTime', val);
             Notification.requestPermission().then(permission => {
                 if (permission === 'granted') {
-                    alert("Radhe Radhe! Notification permission granted. Reminder set successfully.");
+                    alert(i18n[savedLang].alertReminderSuccess);
                 } else if (permission === 'denied') {
-                    alert("Warning: Notification permission denied. Please allow notifications in your browser site settings to receive reminders.");
+                    alert(i18n[savedLang].alertPermissionDenied);
                 }
             });
         }
@@ -587,7 +718,8 @@
                 const bodyText = quotes[Math.floor(Math.random() * quotes.length)];
                 
                 // Show a beautiful in-app floating toast (always works, even in non-secure/blocked environments)
-                showLocalToast("🌸 Radhe Radhe! Reminder: " + bodyText);
+                const savedLang = localStorage.getItem('jap_lang') || 'gu';
+                showLocalToast(i18n[savedLang].toastPrefix + bodyText);
                 
                 // Save immediately to prevent duplicate triggers
                 localStorage.setItem('lastNotifDate', todayStr);
